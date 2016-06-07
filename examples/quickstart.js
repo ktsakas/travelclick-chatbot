@@ -8,11 +8,11 @@
 const Wit = require('../').Wit;
 
 const token = (() => {
-  if (process.argv.length !== 3) {
+  /*if (process.argv.length !== 3) {
     console.log('usage: node examples/quickstart.js <wit-token>');
     process.exit(1);
-  }
-  return process.argv[2];
+  }*/
+  return process.argv[2] || "2FK4QWEZEQJYRGTYZW2YS37XJNMDIHXT";
 })();
 
 const firstEntityValue = (entities, entity) => {
@@ -34,19 +34,28 @@ const actions = {
   },
   merge(sessionId, context, entities, message, cb) {
     // Retrieve the location entity and store it into a context field
+    console.log(entities);
+    const intent = firstEntityValue(entities, 'intent');
+    if (intent) {
+      context.intent = intent;
+    }
     const loc = firstEntityValue(entities, 'location');
     if (loc) {
       context.loc = loc;
     }
+    const price = firstEntityValue(entities, 'price');
+    if (price) {
+      context.price = price;
+    }
+    console.log(context);
     cb(context);
   },
   error(sessionId, context, error) {
+    console.log(context);
     console.log(error.message);
   },
-  ['fetch-weather'](sessionId, context, cb) {
-    // Here should go the api call, e.g.:
-    // context.forecast = apiCall(context.loc)
-    context.forecast = 'sunny';
+  ['list'](sessionId, context, cb) {
+    console.log("Result context ", context);
     cb(context);
   },
 };
