@@ -12,7 +12,7 @@ const token = (() => {
     console.log('usage: node examples/quickstart.js <wit-token>');
     process.exit(1);
   }*/
-  return process.argv[2] || "2FK4QWEZEQJYRGTYZW2YS37XJNMDIHXT";
+  return process.argv[2] || "WIF63EXCCRVJ2CHHDR6AQ4CMGTRRRBTW";
 })();
 
 const firstEntityValue = (entities, entity) => {

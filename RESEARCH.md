@@ -10,6 +10,8 @@ NOTE: if the user types just keywords without valid grammar the API still works.
 
 TIP: Start with `Understanding` and then use `Stories`. The `Understanding` tab is where the rules are defined the `Stories` tab is kind of like testing.
 
+Right now Wit.ai only has a Node.js library so to create an app we would have our backend make the calls to the API, but for efficiency it's probably also possible to use the Wit API directly on the front-end.
+
 ## Goals for chatbot.
 
 Support listing properties based on filters (such as price range, distance and location) and sorting them by relevance, price, stars etc.
@@ -32,6 +34,7 @@ API.ai advantages:
 * It's faster and more responsive.
 * Has a wider array of default entities.
 * Much better documentation with plenty of examples.
+* Allows for templates instead of user input, which would work well with a response produced by the code (eg. the user clicks).
 
 
 ## Conversations
@@ -51,3 +54,8 @@ eg. The listHotels() function requires at least a location and a price range.
 
 ## Brainstoring
 Ask people questions they would ask the chatbot to get ideas and ensure we have covered most of the cases.
+
+## Further things to look into
+
+* Integration with facebook and slack
+* How to integrate with machine answers (eg. click on of the options).

@@ -8,7 +8,7 @@
         <link rel="stylesheet/less" type="text/css" href="css/styles.less">
         <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,400italic' rel='stylesheet' type='text/css'>
     </head>
-    <body>
+    <body ng-app="chatbot" ng-controller="msgCtrl">
         
     	<div id="header">
     	<div class="center">
@@ -19,16 +19,21 @@
     	</div>
 
     	<div class="center">
-    		<ul id="chat">
-    			<li class="bot-message">Hi! How can I help you today?</li>
-    			<li class="user-message">I would like to book a room.</li>
-    		</ul>
+    		<ul id="chat" ng-repeat="msg in messages">
+    			<!-- <li class="bot-message">Hi! How can I help you today?</li> -->
+    			<!-- <li class="user-message">I would like to book a room.</li> -->
+    		  <li class="{{msg.type}}-message">{{msg.text}}</li>
+            </ul>
     	</div>
 
     	<div class="center">
-    	<input type="text" id="new-message" placeholder="Send a message..." />
+        <form ng-submit="addMessage()">
+    	   <input type="text" ng-model="newMessage" id="new-message" placeholder="Send a message..." />
+        </form>
     	</div>
 
     	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+        <script src="js/app.js"></script>
     </body>
 </html>
