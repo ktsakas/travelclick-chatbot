@@ -7,6 +7,12 @@ body {
 	font-family: 'Open Sans', sans-serif;
 }
 
+ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
 #header {
 	background-color: @blue-dark;
 	color: white;
@@ -27,17 +33,18 @@ body {
 }
 
 #chat {
-	list-style: none;
-	margin: 0px;
-	padding: 0px;
+	margin-bottom: 80px;
 
-	.bot-message {
-		font-weight: 600;
-		padding: 20px 0px;
+	.bot {
 		text-align: right;
 	}
 
-	.bot-message:before {
+	.bot.msg {
+		font-weight: 600;
+		padding: 20px 0px;
+	}
+
+	.bot.msg:before {
 		font-family: "Times New Roman";
   		content: "\201C";
   		color: @blue-light;
@@ -47,7 +54,7 @@ body {
 		margin-right: 0.25em;
 	}
 
-	.bot-message:after {
+	.bot.msg:after {
 		font-family: "Times New Roman";
   		content: "\201D";
   		color: @blue-light;
@@ -57,7 +64,18 @@ body {
 		margin-left: 0.25em;
 	}
 
-	.user-message {
+	.bot.setRoomType {
+		li {
+			// float: right;
+			display: inline-block;
+			padding: 5px;
+			border: 1px solid #CCC;
+			border-radius: 5px;
+			margin-left: 5px;
+		}
+	}
+
+	.user.msg {
 		font-weight: 600;
 		background-color: @blue-light;
 		border-radius: 20px 5px;

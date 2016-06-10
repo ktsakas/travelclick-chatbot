@@ -1,3 +1,6 @@
+const l = require('winston');
+l.level = 'silly';
+
 const fetch = require('node-fetch');
 const uuid = require('node-uuid');
 const EventEmitter = require('events').EventEmitter;
@@ -20,12 +23,38 @@ function WitAPI (token) {
 		this.sessionId = uuid.v1();
 		this.actions = actions;
 		this.nextAction = "";
-		this.expectMessage = false;
+		this.stopped = false;
 
 		return this;
 	}
 
 	Story.prototype = EventEmitter.prototype;
+
+	function queryProp(object, query) {
+		query = query.split(".");
+
+		for (var i= 0; i < query.length; i++) {
+			if ( object.hasOwnProperty(query[i]) ) {
+				object = object[query[i]];
+			} else {
+				l.error("Property " + query[i] + " not found in object!");
+				return null;
+			}
+		}
+
+		return object;
+	}
+
+	function setObjectPathValue(source, path, value) {
+		var parts = path.split('.'), len = parts.length, target = source;
+
+		for (var i = 0, part; i < len - 1; i++) {
+			part = parts[i];
+			target = target[part] == undefined ? (target[part] = {}) : target[part];
+		}
+		target[parts[len - 1]] = value;
+		return target;
+	}
 
 	Story.prototype.next = function (message) {
 		var q = 'session_id=' + this.sessionId;
@@ -46,23 +75,27 @@ function WitAPI (token) {
 	};
 
 	Story.prototype.callAction = function (res) {
-		console.log("called action!", res);
+		// console.log("called action!", res);
+		l.debug("action call type: ", res.type);
 		if (res.type == "msg") {
 			this.actions.say.call(this, this.context, res.msg);
 		} else if (res.type == "merge") {
 			this.actions.merge.call(this, this.context, res.entities, res.answer);
 		} else  if (res.type == "action") {
-			this.actions[res.action].call(this, this.context);
+			var action = queryProp(this.actions, res.action);
+
+			if (action) action.call(this, this.context);
+			else return;
 		} else if (res.type == "stop") {
 			this.wait();
 			return;
 		}
 
+		l.debug("has stopped: ", this.stopped, "\n");
 		if (!this.stopped) this.next();
 	};
 
 	Story.prototype.continue = function (message) {
-		if (!message) throw "User did not give input yet!";
 		this.stopped = false;
 		this.answers = [];
 
@@ -72,7 +105,12 @@ function WitAPI (token) {
 
 	Story.prototype.wait = function () {
 		this.stopped = true;
-		this.emit("stopped", this.answers);
+		this.emit("stopped", this.answers, this.context);
+		console.log("emmited stopped!\n");
+	};
+
+	Story.prototype.set = function (property, value) {
+		this.context[property] = value;
 	};
 
 

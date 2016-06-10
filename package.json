@@ -22,6 +22,7 @@
     "express": "^4.13.4",
     "express-json": "^1.0.0",
     "node-fetch": "^1.5.1",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "^1.4.7",
+    "winston": "^2.2.0"
   }
 }

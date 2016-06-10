@@ -19,10 +19,34 @@
     	</div>
 
     	<div class="center">
-    		<ul id="chat" ng-repeat="msg in messages">
+    		<ul id="chat">
     			<!-- <li class="bot-message">Hi! How can I help you today?</li> -->
-    			<!-- <li class="user-message">I would like to book a room.</li> -->
-    		  <li class="{{msg.type}}-message">{{msg.text}}</li>
+
+    		  <li ng-repeat="msg in messages" class="{{msg.owner}} {{msg.type}}">
+                <span ng-show="msg.type == 'msg'">
+                    {{msg.data}}
+                </span>
+
+                <span ng-show="msg.type == 'setRoomType'">
+                <ul>
+                    <li ng-repeat="room in msg.rooms track by $index">
+                        <img ng-src="{{room.picture}}" /><br />
+
+                        {{room.roomName}}<br />
+
+                        <button ng-click="setRoomType(room.roomCode, room.roomName)">
+                            Choose
+                        </button>
+                    </li>
+                </ul>
+                </span>
+
+                <span ng-show="msg.type == 'setDates'">
+                [IMAGINARY CALENDAR] <br />
+
+                <button ng-click="setDates()">Choose February 2nd to February 5th for now</button>
+                </span>
+              </li>
             </ul>
     	</div>
 
