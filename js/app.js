@@ -14,6 +14,55 @@ app.controller("msgCtrl", function ($scope, $http) {
 		}
 	}
 
+	var engaged = false;
+	var curMsg = 0;
+	var engageMsgs = [
+		/*{
+			question: "Would you like to book a single for tonight?",
+			req: "I would like to book a room for tonight for one person."
+		}, {
+			question: "Are you interested in booking a single for another date?",
+			req: "I would like to book a room for one person."
+		}*/
+	];
+	var defMsg = "Is there anything else I could help you with?";
+
+	function parseYesNo (msg) {
+		if (!msg) return false;
+
+		if (msg.match(/(yes|yeah|yep|sure).*/i)) {
+			return true;
+		} else if (msg.match(/(no).*/i)) {
+			return false;
+		} else {
+			throw "Unknown answer!";
+		}
+	}
+
+	function engage (msg) {
+		if (parseYesNo(msg)) {
+			engaged = true;
+			return engageMsgs[curMsg - 1].req;
+		} else {
+			var nextQ = engageMsgs[curMsg] ? engageMsgs[curMsg].question : defMsg;
+			curMsg++;
+
+			if (curMsg > engageMsgs.length) engaged = true;
+
+			$scope.messages.push({
+				data: nextQ,
+				type: "msg",
+				owner: "bot"
+			});
+
+			return null;
+		}
+	}
+
+	function sendMessage() {
+
+	}
+
 	$scope.addMessage = function () {
 		// Handle user message
 		$scope.messages.push({
@@ -23,9 +72,15 @@ app.controller("msgCtrl", function ($scope, $http) {
 		});
 
 		// Handle bot answer
-		$http.get("/message", {
-			params: { message: $scope.newMessage }
-		}).then(showMessage);
+		var sendMessage;
+		if (!engaged) sendMessage = engage($scope.newMessage);
+		else sendMessage = $scope.newMessage;
+
+		if (sendMessage) {
+			$http.get("/message", {
+				params: { message: sendMessage }
+			}).then(showMessage);
+		}
 
 		console.log($scope.messages);
 	}
@@ -46,4 +101,7 @@ app.controller("msgCtrl", function ($scope, $http) {
 			params: { startDate: startDate, endDate: endDate }
 		}).then(showMessage);
 	}
+
+	$http.get("/reset", { params: {} });
+	engage();
 });

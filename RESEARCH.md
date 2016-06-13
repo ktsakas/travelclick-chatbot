@@ -35,6 +35,7 @@ API.ai advantages:
 * Has a wider array of default entities.
 * Much better documentation with plenty of examples.
 * Allows for templates instead of user input, which would work well with a response produced by the code (eg. the user clicks).
+* Wit.ai only gives out the date and not the text
 
 
 ## Conversations
@@ -59,3 +60,7 @@ Ask people questions they would ask the chatbot to get ideas and ensure we have 
 
 * Integration with facebook and slack
 * How to integrate with machine answers (eg. click on of the options).
+* Spelling correction using Bing API
+* Language detection (if you only speek english)
+* Enable speech-to-text
+* Enable text-to-speech

@@ -60,6 +60,7 @@ function WitAPI (token) {
 		var q = 'session_id=' + this.sessionId;
 		if (message) q += '&q=' + encodeURIComponent(message);
 
+		console.log("sent context: ", this.context);
 		fetch(baseURL + '/converse?' + q, {
 			method: 'POST',
 			headers: headers,
@@ -111,6 +112,11 @@ function WitAPI (token) {
 
 	Story.prototype.set = function (property, value) {
 		this.context[property] = value;
+	};
+
+	Story.prototype.reset = function () {
+		this.context = {};
+		this.answers = [];
 	};
 
 
