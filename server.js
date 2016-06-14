@@ -1,29 +1,43 @@
 const l = require('winston');
+const request = require('request');
+const _ = require('underscore');
+
 l.level = 'silly';
 
 const express = require('express');
 const bodyParser = require('body-parser')
+const Q = require('q');
 const app = express();
 const port = process.env.PORT || 8080;
 
 // Wit.ai stuff
 const token = process.argv[2] || "5IXU33BVOCVY5H4H4CUW5LCQP6WXL636";
-const WitAPI = new require('./wit-api.js')(token);
-const request = require('request');
-const _ = require('underscore');
-const WatsonAPI = require('./watson-api.js');
-var BingAPI = require('node-bing-api')({
-	accKey: "1936e4b6536b4de49addb18f2d4ae22b",
-	rootUri: "https://api.datamarket.azure.com/Bing/SearchWeb/v1/"
-});
+const WitAPI = new require('./apis/wit.js')(token),
+	  WatsonAPI = require('./apis/watson.js'),
+	  BingAPI = require('./apis/bing.js'),
+	  TwilioAPI = require('./apis/twilio.js');
+const Chat = require('./sequential-chat.js'),
+	  chat = new Chat();
 
-new WatsonAPI().analyze("Hi, how are you?", function (language, sentiment) {
+/*WatsonAPI.sentiment("Hi, how are you?", function (language, sentiment) {
 	console.log(sentiment, language);
 });
 
-BingAPI.spelling('Does the room have a telepone?', function (err, res, body) {
-	console.log(body); //awesome spell 
+WatsonAPI.emotions("Hi, how are you?", function (err, emotions) {
+	console.log(emotions);
 });
+
+WatsonAPI.identifyLang("Mon allemand n'est pas que bonne, pourriez-vous répéter cela en anglais?", function (err, translation) {
+	l.debug("lang: ", err, translation);
+});
+
+WatsonAPI.translateEn("My French is not that good could you repeat that in English?", 'fr', function (err, translation) {
+	l.debug("to english: ", err, translation);
+});
+
+BingAPI.spellcheck('Does the room have a telepone?', function (err, spelling) {
+	console.log(spelling); // awesome spell 
+});*/
 
 const firstEntityValue = (entities, entity) => {
   l.debug(entity, JSON.stringify(entities[entity]));
@@ -112,9 +126,9 @@ app.use(express.static('.'))
 const Story = new WitAPI.Story({
 	say(context, message) {
 		l.debug("saying!", message, "\n");
-		this.addAnswer({
+		chat.addRepsonse({
 			type: "msg",
-			data: message
+			text: message
 		});
 	},
 
@@ -147,9 +161,9 @@ const Story = new WitAPI.Story({
 		this.set('roomType', 'single');
 		this.set('price', '60$');
 
-		/*this.addAnswer({
+		/*chat.addResponse({
 			type: "msg",
-			data: JSON.stringify(context)
+			text: JSON.stringify(context)
 		});*/
 
 		l.debug("Updated context: ", this.context);
@@ -163,9 +177,9 @@ const Story = new WitAPI.Story({
 		console.log("amenity ", context);
 
 		queryRooms(context.amenity, function (results) {
-			this.addAnswer({
+			chat.addResponse({
 				type: "msg",
-				data: JSON.stringify(results)
+				text: JSON.stringify(results)
 			});
 		}.bind(this));
 	},
@@ -194,13 +208,13 @@ const Story = new WitAPI.Story({
 
 	reservation: {
 		setDates(context) {
-			this.addAnswer({ type: "setDates" });
+			chat.addResponse({ type: "setDates" });
 
 			this.wait();
 		},
 
 		setRoomType(context) {
-			this.addAnswer({
+			chat.addResponse({
 				type: "setRoomType",
 				rooms: [
 					{ hotelCode: 1098, roomCode: 1289, roomName: "Suite", picture: "http://placehold.it/100x100"},
@@ -221,20 +235,65 @@ const Story = new WitAPI.Story({
 });
 
 function requestHandler (req, res) {
-	l.debug(req.query.message);
+	var message = req.query.message;
 
-	Story.continue(req.query.message);
+	WatsonAPI.sentiment(message, function (lang, sentiment) {
+		if (lang != 'english') {
+			WatsonAPI.identifyLang(message, function (err, langAcronym) {
+				console.log("acronym: ", langAcronym);
+				WatsonAPI.translateEn(
+					"My " + lang + " is not that good, could you repeat that in English?", langAcronym,
+					function (err, translation) {
+						console.log(err);
+						l.debug("translation: ", translation);
 
-	Story.once("stopped", function (answers, context) {
-		// l.debug("answers: ", answers);
-		// l.debug("context: ", context);
-		res.json({ "answers": answers });
+						chat.addResponse({
+							type: "msg",
+							text: translation,
+							lang: lang
+						});
+
+						res.json({
+							analysis: { lang: lang },
+							answers: chat.popUnsent()
+						});
+					}
+				);
+			});
+
+		} else {
+			WatsonAPI.emotions(message, function (lang, emotions) {
+				Story.continue(message);
+
+				Story.once("stopped", function (answers, context) {
+					l.debug("responding to message");
+
+					res.json({
+						analysis: {
+							sentiment: sentiment,
+							emotions: emotions
+						},
+						answers: chat.popUnsent()
+					});
+				});
+			});
+		}
 	});
 }
 
 app.get('/message', requestHandler);
 
-app.get('/setRoomType', function (req, res) {
+app.get('/reviews', function () {
+	var reviews = require('mock-reviews.js');
+
+	_.chain(reviews)
+	 .map() 
+	_.sortBy(reviews, function (review) {
+
+	})
+});
+
+/*app.get('/setRoomType', function (req, res) {
 	Story.set('roomType', req.query.code);
 
 	requestHandler(req, res);
@@ -244,7 +303,7 @@ app.get('/setDates', function (req, res) {
 	Story.set('dates', req.query.startDate);
 
 	requestHandler(req, res);
-});
+});*/
 
 app.get('/reset', function (req, res) {
 	Story.reset();

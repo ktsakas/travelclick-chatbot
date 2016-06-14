@@ -1,11 +1,12 @@
-var app = angular.module("chatbot", []);
+var app = angular.module("chatbot", ['jsonFormatter']);
 
 app.controller("msgCtrl", function ($scope, $http) {
 	$scope.messages = [];
 
 	function showMessage (res) {
 		var answers = res.data.answers;
-		// console.log("answers: ", answers);
+		$scope.messages[$scope.messages.length - 1].analysis = 
+			res.data.analysis;
 
 		for (var i= 0; i < answers.length; i++) {
 			answers[i].owner = "bot";
@@ -50,7 +51,7 @@ app.controller("msgCtrl", function ($scope, $http) {
 			if (curMsg > engageMsgs.length) engaged = true;
 
 			$scope.messages.push({
-				data: nextQ,
+				text: nextQ,
 				type: "msg",
 				owner: "bot"
 			});
@@ -59,16 +60,13 @@ app.controller("msgCtrl", function ($scope, $http) {
 		}
 	}
 
-	function sendMessage() {
-
-	}
-
 	$scope.addMessage = function () {
 		// Handle user message
 		$scope.messages.push({
-			data: $scope.newMessage,
+			text: $scope.newMessage,
 			type: "msg",
-			owner: "user"
+			owner: "user",
+			showAnalysis: false
 		});
 
 		// Handle bot answer

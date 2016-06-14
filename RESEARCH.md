@@ -64,3 +64,8 @@ Ask people questions they would ask the chatbot to get ideas and ensure we have 
 * Language detection (if you only speek english)
 * Enable speech-to-text
 * Enable text-to-speech
+* TripAdvisor has a free API, but requires a working link (possible not free alternative is Olery)
+
+## APP possibilities
+* Text/email hotel (eg. to notify arrival). Note that it is not possible to know the users phone number.
+* Integrate with Siri

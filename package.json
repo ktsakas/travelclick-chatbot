@@ -24,7 +24,9 @@
     "node-bing-api": "^2.4.1",
     "node-fetch": "^1.5.1",
     "node-uuid": "^1.4.7",
+    "q": "^1.4.1",
     "request": "^2.72.0",
+    "twilio": "^2.9.1",
     "underscore": "^1.8.3",
     "watson-developer-cloud": "^1.9.3",
     "winston": "^2.2.0"
