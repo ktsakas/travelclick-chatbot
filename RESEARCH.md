@@ -46,10 +46,15 @@ What happens is we store arguments from every sentence and keep asking for more 
 eg. The listHotels() function requires at least a location and a price range.
 `User: ` Show me a list of hotels.
 *we know the intent the user wants to get a list of hotels*
+
 `Bot: ` Where would you like to go?
+
 `User: ` New York.
+
 `Bot: ` What is your price range?
+
 `User: ` From 10$ to 100$.
+
 `Bot: ` Here is a list of hotels:
 *only now can we run the query to find possible hotels*
 
