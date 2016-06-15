@@ -18,6 +18,21 @@ const WitAPI = new require('./apis/wit.js')(token),
 	  TwilioAPI = require('./apis/twilio.js');
 const Chat = require('./sequential-chat.js'),
 	  chat = new Chat();
+const apiai = require('apiai');
+
+var apiaiApp = apiai("3ec2ce2feba540869d5f9ff32bc6680c");
+
+var aiReq = apiaiApp.textRequest('I would like to book a hotel room.');
+
+aiReq.on('response', function(response) {
+    console.log(response);
+});
+
+aiReq.on('error', function(error) {
+    console.log(error);
+});
+
+aiReq.end();
 
 const firstEntityValue = (entities, entity) => {
   l.debug(entity, JSON.stringify(entities[entity]));
@@ -240,6 +255,18 @@ function requestHandler (req, res) {
 					}
 				);
 			});
+
+			BingAPI.spellcheck(text)
+				.then(function (response) {
+					if (spellcheck == "correct") {
+						return aiAPI.request();
+					} else {
+
+					}
+				})
+				.then(function (response) {
+					console.log(response);
+				});
 
 		} else {
 			WatsonAPI.emotions(message, function (lang, emotions) {
