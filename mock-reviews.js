@@ -5,7 +5,7 @@ var reviews = [
 	},
 	{
 		"rating": 5,
-		"text": "Upon arrival Martha took care of our reservation and due to a small booking glitch she offered to "upgrade" us. She was professional, courteous and very helpful and the upgrade was a big help to our family of 6. Then upon checking out we had Maria A. and again, she went two steps above and beyond to help us. She went over our bill in detail, she took our luggage into a holding room (without the fee of 5.00 per bag) and she helped direct us to a few sites we wanted to see prior to leaving NYC in a few hours. We met all kinds of service folks while visiting NY but these two were the best. Then add the house staff...super courteous and helpful. I would recommend the Hotel Pennsylvania to anyone traveling to NY as the location was great for sight-seeing."
+		"text": "Upon arrival Martha took care of our reservation and due to a small booking glitch she offered to 'upgrade' us. She was professional, courteous and very helpful and the upgrade was a big help to our family of 6. Then upon checking out we had Maria A. and again, she went two steps above and beyond to help us. She went over our bill in detail, she took our luggage into a holding room (without the fee of 5.00 per bag) and she helped direct us to a few sites we wanted to see prior to leaving NYC in a few hours. We met all kinds of service folks while visiting NY but these two were the best. Then add the house staff...super courteous and helpful. I would recommend the Hotel Pennsylvania to anyone traveling to NY as the location was great for sight-seeing."
 	},
 	{
 		"rating": 5,

@@ -19,26 +19,6 @@ const WitAPI = new require('./apis/wit.js')(token),
 const Chat = require('./sequential-chat.js'),
 	  chat = new Chat();
 
-/*WatsonAPI.sentiment("Hi, how are you?", function (language, sentiment) {
-	console.log(sentiment, language);
-});
-
-WatsonAPI.emotions("Hi, how are you?", function (err, emotions) {
-	console.log(emotions);
-});
-
-WatsonAPI.identifyLang("Mon allemand n'est pas que bonne, pourriez-vous répéter cela en anglais?", function (err, translation) {
-	l.debug("lang: ", err, translation);
-});
-
-WatsonAPI.translateEn("My French is not that good could you repeat that in English?", 'fr', function (err, translation) {
-	l.debug("to english: ", err, translation);
-});
-
-BingAPI.spellcheck('Does the room have a telepone?', function (err, spelling) {
-	console.log(spelling); // awesome spell 
-});*/
-
 const firstEntityValue = (entities, entity) => {
   l.debug(entity, JSON.stringify(entities[entity]));
   const val = entities && entities[entity] &&
@@ -283,15 +263,43 @@ function requestHandler (req, res) {
 
 app.get('/message', requestHandler);
 
-app.get('/reviews', function () {
-	var reviews = require('mock-reviews.js');
 
-	_.chain(reviews)
-	 .map() 
-	_.sortBy(reviews, function (review) {
+app.get('/reviews', function (req, res) {
+	var checkOnly = 10;
 
-	})
+	var reviews = require('./bad-mock-reviews.js');
+	var done = _.after(checkOnly, function () {
+		res.json(reviews.sortBy(function (review) {
+			review.sentiment.score = parseFloat(review.sentiment.score);
+
+			return review.sentiment.score;
+		}));
+	});
+
+	reviews = _.chain(reviews)
+		.sortBy(function (review) {
+			return review.text.length;
+		})
+		.first(checkOnly)
+		.each(function (review) {
+			review.size = review.text.length;
+
+			WatsonAPI.sentiment(review.text, function (lang, sentiment)  {
+				console.log(sentiment);
+				review.sentiment = sentiment;
+
+				done();
+			});
+
+			// return review;
+		});
+
+	console.log(reviews.size());
 });
+
+/*WatsonAPI.sentiment("Give me the sentiment.", function (lang, sentiment)  {
+	console.log(sentiment);
+});*/
 
 /*app.get('/setRoomType', function (req, res) {
 	Story.set('roomType', req.query.code);

@@ -36,6 +36,9 @@ API.ai advantages:
 * Much better documentation with plenty of examples.
 * Allows for templates instead of user input, which would work well with a response produced by the code (eg. the user clicks).
 * Wit.ai only gives out the date and not the text
+* Easier debugging throuth the website (shows details about the query)
+* Much more opinionated (helps avoid many pitfalls)
+* API.ai stores contexts and holds them
 
 
 ## Conversations
@@ -44,6 +47,7 @@ When the users intent (or action) is known we would like to execute it, however 
 What happens is we store arguments from every sentence and keep asking for more info until all argument required (this can be configured) for our function (or action) are there.
 
 eg. The listHotels() function requires at least a location and a price range.
+
 `User: ` Show me a list of hotels.
 *we know the intent the user wants to get a list of hotels*
 
@@ -70,6 +74,7 @@ Ask people questions they would ask the chatbot to get ideas and ensure we have 
 * Enable speech-to-text
 * Enable text-to-speech
 * TripAdvisor has a free API, but requires a working link (possible not free alternative is Olery)
+* Linking with Facebook, Twitter, Instagram profiles of the hotel to show info
 
 ## APP possibilities
 * Text/email hotel (eg. to notify arrival). Note that it is not possible to know the users phone number.
