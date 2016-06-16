@@ -5,8 +5,7 @@ const _ = require('underscore');
 l.level = 'silly';
 
 const express = require('express');
-const bodyParser = require('body-parser')
-const Q = require('q');
+const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -18,21 +17,9 @@ const WitAPI = new require('./apis/wit.js')(token),
 	  TwilioAPI = require('./apis/twilio.js');
 const Chat = require('./sequential-chat.js'),
 	  chat = new Chat();
-const apiai = require('apiai');
 
-var apiaiApp = apiai("3ec2ce2feba540869d5f9ff32bc6680c");
-
-var aiReq = apiaiApp.textRequest('I would like to book a hotel room.');
-
-aiReq.on('response', function(response) {
-    console.log(response);
-});
-
-aiReq.on('error', function(error) {
-    console.log(error);
-});
-
-aiReq.end();
+const AIAPI = require('./apis/api_ai.js');
+const AIapi = new AIAPI();
 
 const firstEntityValue = (entities, entity) => {
   l.debug(entity, JSON.stringify(entities[entity]));
@@ -229,48 +216,87 @@ const Story = new WitAPI.Story({
 	}
 });
 
-function requestHandler (req, res) {
-	var message = req.query.message;
+function answer () {
+	AIapi.query(message)
+		.on('say', function (text) {
+			chat.addResponse({
+				type: "msg",
+				text: translation,
+				lang: lang
+			});
+
+			res.json({
+				analysis: { lang: lang },
+				answers: chat.popUnsent()
+			});
+		});
+}
+
+function converse (message, cb) {
+	var analysis = {};
 
 	WatsonAPI.sentiment(message, function (lang, sentiment) {
+		analysis.lang = lang;
+
+		/*
+			If the message is not in English ask the user in his native language
+			to repeat the message in English
+		*/
 		if (lang != 'english') {
 			WatsonAPI.identifyLang(message, function (err, langAcronym) {
-				console.log("acronym: ", langAcronym);
 				WatsonAPI.translateEn(
-					"My " + lang + " is not that good, could you repeat that in English?", langAcronym,
-					function (err, translation) {
-						console.log(err);
-						l.debug("translation: ", translation);
-
-						chat.addResponse({
-							type: "msg",
-							text: translation,
-							lang: lang
-						});
-
-						res.json({
-							analysis: { lang: lang },
-							answers: chat.popUnsent()
-						});
-					}
+					"My " + lang + " is not that good, could you repeat that in English?",
+					langAcronym,
+					(err, translation) => chat.addResponse({
+						type: "msg",
+						text: translation
+					})
 				);
 			});
 
-			BingAPI.spellcheck(text)
-				.then(function (response) {
-					if (spellcheck == "correct") {
-						return aiAPI.request();
-					} else {
+			return;
+		}
+		
+		/*
+			Check the message for spelling errors
+		*/
+		BingAPI.spellcheck(message, function (err, spellingErrs) {
+			analysis.spellingErrors = spellingErrs;
 
-					}
-				})
-				.then(function (response) {
-					console.log(response);
+			if (spellingErrs.length > 0) {
+				chat.addResponse({
+					type: "msg",
+					text: "Did you mean?"
 				});
 
-		} else {
-			WatsonAPI.emotions(message, function (lang, emotions) {
-				Story.continue(message);
+				cb(analysis, chat.popUnsent());
+				return;
+			}
+
+			/*
+				Analyze the emotions in the message
+			*/
+			WatsonAPI.emotions(message, function (err, emotions) {
+				analysis.sentiment = sentiment;
+				analysis.emotions = emotions;
+
+				AIapi.query(message);
+
+				AIapi.once('say', (answer) => {
+					console.log(answer);
+
+					chat.addResponse({
+						type: "msg",
+						text: answer
+					});
+
+					cb(analysis, chat.popUnsent());
+				});
+
+				// cb(analysis, chat.popUnsent());
+				return;
+
+				/*Story.continue(message);
 
 				Story.once("stopped", function (answers, context) {
 					l.debug("responding to message");
@@ -282,13 +308,22 @@ function requestHandler (req, res) {
 						},
 						answers: chat.popUnsent()
 					});
-				});
+				});*/
 			});
-		}
+		});
 	});
 }
 
-app.get('/message', requestHandler);
+app.get('/message', function (req, res) {
+	var message = req.query.message;
+
+	converse(message, function (analysis, answers) {
+		res.json({
+			analysis: analysis,
+			answers: answers
+		})
+	});
+});
 
 
 app.get('/reviews', function (req, res) {

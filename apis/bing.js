@@ -6,13 +6,11 @@ const request = require('request').defaults({
 
 var BingAPI = {
 	spellcheck: function (text, cb) {
-		request.post({
+		return request.post({
 			url: 'https://bingapis.azure-api.net/api/v5/spellcheck?mode=proof',
 			form: { text: text }
-		},
-			function(err, res, body) {
-				cb(err, body);
-			}
+		}, 
+			(err, res, body) => cb(err, JSON.parse(body).flaggedTokens)
 		);
 	}
 };

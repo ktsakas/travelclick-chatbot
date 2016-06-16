@@ -1,4 +1,4 @@
-const watson = require('watson-developer-cloud');
+var watson = require('watson-developer-cloud');
 
 var WatsonAPI = {
 	alchemy_language: watson.alchemy_language({ 
@@ -19,7 +19,7 @@ var WatsonAPI = {
 	}),
 
 	sentiment: function (text, cb) {
-		this.alchemy_language.sentiment({
+		return this.alchemy_language.sentiment({
 			text: text
 		}, function (err, response) {
 			if (err) throw "Sentiment analysis request failed."
@@ -28,7 +28,7 @@ var WatsonAPI = {
 	},
 
 	identifyLang: function (text, cb) {
-		this.language_translation.identify({
+		return this.language_translation.identify({
 			text: text
 		}, function (err, detected) {
 			var lang = detected.languages[0].language;
@@ -38,7 +38,7 @@ var WatsonAPI = {
 	},
 
 	translateEn: function (text, to, cb) {
-		this.language_translation.translate({
+		return this.language_translation.translate({
 			text: text, source: 'en', target: to
 		}, function (err, res) {
 			cb(err, res.translations[0].translation);
@@ -46,8 +46,9 @@ var WatsonAPI = {
 	},
 
 	emotions: function (text, cb) {
-		this.tone_analyzer.tone({ text: text },  function(err, tone) {
-			cb(err, tone.document_tone.tone_categories[0].tones);
+		return this.tone_analyzer.tone({ text: text },  function(err, tone) {
+			if (err) console.log(err);
+			else cb(err, tone.document_tone.tone_categories[0].tones);
 		});
 	}
 };
