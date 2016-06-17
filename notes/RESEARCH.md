@@ -79,3 +79,4 @@ Ask people questions they would ask the chatbot to get ideas and ensure we have 
 ## APP possibilities
 * Text/email hotel (eg. to notify arrival). Note that it is not possible to know the users phone number.
 * Integrate with Siri
+* Make the whole app client side (no real server is required)

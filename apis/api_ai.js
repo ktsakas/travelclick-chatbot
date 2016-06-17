@@ -24,7 +24,7 @@ AIapi.prototype.query = function (text) {
 		if (res.result.action == "" || res.result.actionIncomplete) {
 			self.emit("say", res.result.fulfillment.speech);
 		} else {
-
+			self.emit(res.result.action, res.result.parameters);
 		}
 
 	}).on('error', function (err) {

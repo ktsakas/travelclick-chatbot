@@ -7,7 +7,7 @@ const request = require('request').defaults({
 var BingAPI = {
 	spellcheck: function (text, cb) {
 		return request.post({
-			url: 'https://bingapis.azure-api.net/api/v5/spellcheck?mode=proof',
+			url: 'https://bingapis.azure-api.net/api/v5/spellcheck?mode=spell',
 			form: { text: text }
 		}, 
 			(err, res, body) => cb(err, JSON.parse(body).flaggedTokens)

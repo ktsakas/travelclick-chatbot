@@ -293,6 +293,22 @@ function converse (message, cb) {
 					cb(analysis, chat.popUnsent());
 				});
 
+				AIapi.once('availability', (params) => {
+					console.log(params);
+				});
+
+				AIapi.once('location', (params) => {
+					chat.addResponse({
+						type: "location",
+						location: {
+			                lat: 37.8386741,
+			                lng: -122.2936934
+			            }
+					});
+
+					cb(analysis, chat.popUnsent());
+				});
+
 				// cb(analysis, chat.popUnsent());
 				return;
 

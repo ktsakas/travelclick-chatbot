@@ -9,7 +9,7 @@
         <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,400italic' rel='stylesheet' type='text/css' />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.css" rel="stylesheet" type="text/css" />
     </head>
-    <body ng-app="chatbot" ng-controller="msgCtrl">
+    <body ng-app="chatbot" ng-controller="chatCtrl">
         
     	<div id="header">
     	<div class="center">
@@ -23,7 +23,7 @@
     		<ul id="chat">
     			<!-- <li class="bot-message">Hi! How can I help you today?</li> -->
 
-    		  <li ng-repeat="msg in messages" class="{{msg.owner}} {{msg.type}}">
+    		  <li ng-controller="msgCtrl" ng-repeat="msg in messages" class="{{msg.owner}} {{msg.type}}">
                 <span ng-click="msg.showAnalysis = !msg.showAnalysis" ng-show="msg.type == 'msg'">
                     {{msg.text}}
                 </span>
@@ -44,6 +44,8 @@
                 </ul>
                 </span>
 
+                <div class="map" ng-show="msg.type == 'location'"></div>
+
                 <span ng-show="msg.type == 'setDates'">
                 [IMAGINARY CALENDAR] <br />
 
@@ -62,6 +64,35 @@
     	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk&callback=initMap">
+        </script>
+
         <script src="js/app.js"></script>
+        <script type="text/javascript">
+        function initMap() {
+            
+
+            /*var directionsService = new google.maps.DirectionsService;
+            var directionsDisplay = new google.maps.DirectionsRenderer;
+            directionsDisplay.setMap(map);
+
+            directionsService.route({
+                origin: {
+                    lat: 37.8386741,
+                    lng: -122.2936934
+                },
+                destination: "Los Angeles, CA",
+                travelMode: google.maps.TravelMode.DRIVING
+            }, function(response, status) {
+                console.log(response, status);
+
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });*/
+        }
+        </script>
     </body>
 </html>

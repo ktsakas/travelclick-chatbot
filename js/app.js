@@ -1,6 +1,6 @@
 var app = angular.module("chatbot", ['jsonFormatter']);
 
-app.controller("msgCtrl", function ($scope, $http) {
+app.controller("chatCtrl", function ($scope, $element, $http) {
 	$scope.messages = [];
 
 	function showMessage (res) {
@@ -102,4 +102,22 @@ app.controller("msgCtrl", function ($scope, $http) {
 
 	$http.get("/reset", { params: {} });
 	engage();
+});
+
+app.controller("msgCtrl", function ($scope, $element) {
+	if ($scope.msg.type == "location") {
+		console.log($scope.msg.location);
+
+        var map = new google.maps.Map($element[0].getElementsByClassName("map")[0], {
+            zoom: 12,
+            center: $scope.msg.location,
+            disableDefaultUI: true
+        });
+
+        var marker = new google.maps.Marker({
+            position: $scope.msg.location,
+            map: map,
+            title: "Hotel"
+        });
+	}
 });
