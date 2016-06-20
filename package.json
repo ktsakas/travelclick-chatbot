@@ -19,6 +19,7 @@
   "author": "Julien Odent <julien@wit.ai>",
   "dependencies": {
     "apiai": "^2.0.5",
+    "async": "^2.0.0-rc.6",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
     "express-json": "^1.0.0",

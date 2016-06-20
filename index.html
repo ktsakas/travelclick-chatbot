@@ -44,7 +44,7 @@
                 </ul>
                 </span>
 
-                <div class="map" ng-show="msg.type == 'location'"></div>
+                <div class="map" ng-show="msg.type == 'location' || msg.type == 'directions'"></div>
 
                 <span ng-show="msg.type == 'setDates'">
                 [IMAGINARY CALENDAR] <br />
@@ -57,42 +57,16 @@
 
     	<div class="center">
         <form ng-submit="addMessage()">
-    	   <input type="text" ng-model="newMessage" id="new-message" placeholder="Send a message..." />
+    	   <input type="text" ng-model="newMessage" ng-disabled="disabled" id="new-message" placeholder="Send a message..." />
         </form>
     	</div>
 
     	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk&callback=initMap">
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk">
         </script>
 
         <script src="js/app.js"></script>
-        <script type="text/javascript">
-        function initMap() {
-            
-
-            /*var directionsService = new google.maps.DirectionsService;
-            var directionsDisplay = new google.maps.DirectionsRenderer;
-            directionsDisplay.setMap(map);
-
-            directionsService.route({
-                origin: {
-                    lat: 37.8386741,
-                    lng: -122.2936934
-                },
-                destination: "Los Angeles, CA",
-                travelMode: google.maps.TravelMode.DRIVING
-            }, function(response, status) {
-                console.log(response, status);
-
-                if (status === google.maps.DirectionsStatus.OK) {
-                    directionsDisplay.setDirections(response);
-                } else {
-                    window.alert('Directions request failed due to ' + status);
-                }
-            });*/
-        }
-        </script>
     </body>
 </html>

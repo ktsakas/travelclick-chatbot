@@ -1,9 +1,15 @@
 var app = angular.module("chatbot", ['jsonFormatter']);
 
+/*
+	Chat controller
+*/
 app.controller("chatCtrl", function ($scope, $element, $http) {
 	$scope.messages = [];
+	$scope.disabled = false;
 
 	function showMessage (res) {
+		$scope.disabled = false;
+
 		var answers = res.data.answers;
 		$scope.messages[$scope.messages.length - 1].analysis = 
 			res.data.analysis;
@@ -61,6 +67,8 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 	}
 
 	$scope.addMessage = function () {
+		$scope.disabled = true;
+		document.getElementById('new-message').value = "";
 		// Handle user message
 		$scope.messages.push({
 			text: $scope.newMessage,
@@ -83,41 +91,53 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 		console.log($scope.messages);
 	}
 
-	$scope.setRoomType = function (roomCode, roomName) {
-		console.log("room", roomCode, roomName);
-
-		$http.get("/setRoomType", {
-			params: { code: roomCode, name: roomName }
-		}).then(showMessage);
-	}
-
-	$scope.setDates = function (startDate, endDate) {
-		startDate = new Date('02/02/2017').getTIme();
-		endDate = new Date('02/05/2017').getTime();
-
-		$http.get("/setDates", {
-			params: { startDate: startDate, endDate: endDate }
-		}).then(showMessage);
-	}
-
 	$http.get("/reset", { params: {} });
 	engage();
 });
 
-app.controller("msgCtrl", function ($scope, $element) {
-	if ($scope.msg.type == "location") {
-		console.log($scope.msg.location);
 
-        var map = new google.maps.Map($element[0].getElementsByClassName("map")[0], {
+/*
+	Chat single message controller
+*/
+app.controller("msgCtrl", function ($scope, $element) {
+	var map;
+	console.log($scope.msg.type);
+	if ($scope.msg.type == 'location' || $scope.msg.type == 'directions') {
+		map = new google.maps.Map($element[0].getElementsByClassName("map")[0], {
             zoom: 12,
             center: $scope.msg.location,
             disableDefaultUI: true
         });
+	}
+
+	if ($scope.msg.type == "location") {
+		console.log($scope.msg.location);
 
         var marker = new google.maps.Marker({
             position: $scope.msg.location,
             map: map,
             title: "Hotel"
+        });
+	} else if ($scope.msg.type == 'directions') {
+        var directionsService = new google.maps.DirectionsService;
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        directionsDisplay.setMap(map);
+
+        directionsService.route({
+            origin: {
+                lat: 37.8386741,
+                lng: -122.2936934
+            },
+            destination: "Sacramento",
+            travelMode: google.maps.TravelMode.DRIVING
+        }, function(response, status) {
+            console.log(response, status);
+
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
         });
 	}
 });

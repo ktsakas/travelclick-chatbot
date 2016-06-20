@@ -22,8 +22,7 @@ var WatsonAPI = {
 		return this.alchemy_language.sentiment({
 			text: text
 		}, function (err, response) {
-			if (err) throw "Sentiment analysis request failed."
-			else cb(response.language, response.docSentiment);
+			cb(err, response.language, response.docSentiment);
 		});
 	},
 

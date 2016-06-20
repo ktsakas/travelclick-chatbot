@@ -3,10 +3,11 @@ const util = require('util');
 
 const api_key = "3ec2ce2feba540869d5f9ff32bc6680c";
 const AI = require('apiai');
-const ai = new AI(api_key);
 const request = require('request');
 
 function AIapi () {
+	this.ai = new AI(api_key);
+
 	return this;
 }
 
@@ -14,7 +15,7 @@ util.inherits(AIapi, EventEmitter);
 
 AIapi.prototype.query = function (text) {
 	var self = this;
-	var aiQuery = ai.textRequest(text);
+	var aiQuery = this.ai.textRequest(text);
 
 	aiQuery.on('response', function (res) {
 
@@ -52,7 +53,7 @@ AIapi.prototype.tts = function (text) {
 	);
 };
 
-new AIapi().tts();
+// new AIapi().tts();
 
 /*ttsQuery.on('data', function (data) {
 	
