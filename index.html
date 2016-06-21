@@ -8,6 +8,7 @@
         <link rel="stylesheet/less" type="text/css" href="css/styles.less">
         <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,400italic' rel='stylesheet' type='text/css' />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/css/pikaday.min.css" rel="stylesheet" type="text/css" />
     </head>
     <body ng-app="chatbot" ng-controller="chatCtrl">
         
@@ -15,13 +16,23 @@
     	<div class="center">
     		TravelClick Chatbot Assistant
 
-    		<div class="comment">Find a hotel to stay, learn more about a hotel you are interested or make a reservation.</div>
+    		<div class="comment">Book a hotel, ask for room information, directions or directly contact the hotel.</div>
     	</div>
     	</div>
 
     	<div class="center">
     		<ul id="chat">
-    			<!-- <li class="bot-message">Hi! How can I help you today?</li> -->
+    		  <li class="bot msg">
+                Hey, I am a chatbot. <br />
+                Let me know if you need help with any of the following:
+                    <ul>
+                        <li>Booking a room</li>
+                        <li>Ask information about the hotel and our rooms</li>
+                        <li>Ask about availability</li>
+                        <li>Get our address or directions</li>
+                        <li>Contact the hotel</li>
+                    </ul>
+              </li>
 
     		  <li ng-controller="msgCtrl" ng-repeat="msg in messages" class="{{msg.owner}} {{msg.type}}">
                 <span ng-click="msg.showAnalysis = !msg.showAnalysis" ng-show="msg.type == 'msg'">
@@ -46,6 +57,29 @@
 
                 <div class="map" ng-show="msg.type == 'location' || msg.type == 'directions'"></div>
 
+                <div ng-show="msg.type == 'availability'" class="calendar">
+                    <a class="previous">&#x2039;</a>
+                    <table cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td>Mon</td>
+                            <td>Tue</td>
+                            <td>Wed</td>
+                            <td>Th</td>
+                            <td>Fri</td>
+                            <td>Sat</td>
+                            <td>Sun</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="dayRange in dayRanges">
+                            <td ng-repeat="day in dayRange" class="{{day.class}}">{{day.num}}</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                    <a class="next">&#x203A;</a>
+                </div>
+
                 <span ng-show="msg.type == 'setDates'">
                 [IMAGINARY CALENDAR] <br />
 
@@ -53,19 +87,23 @@
                 </span>
               </li>
             </ul>
+            
     	</div>
 
+
     	<div class="center">
-        <form ng-submit="addMessage()">
+        <form ng-submit="addMessage(this)">
     	   <input type="text" ng-model="newMessage" ng-disabled="disabled" id="new-message" placeholder="Send a message..." />
         </form>
     	</div>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
     	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.js"></script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk">
         </script>
+        <script src="js/api-ai/target/api.ai.min.js"></script>
 
         <script src="js/app.js"></script>
     </body>

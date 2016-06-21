@@ -115,11 +115,7 @@ function setupActions (res, cb) {
 
 		var datePeriod = params['date-period'].split('/');
 
-		Availability.get({
-			dateIn: datePeriod[0],
-			dateOut: datePeriod[1],
-			guests: params.guests.roomType
-		}, function (err, available) {
+		Availability.get(params, function (err, available) {
 			console.log(available);
 
 			chat.addResponse({
@@ -132,6 +128,11 @@ function setupActions (res, cb) {
 	});
 
 	AIapi.once('location', (params) => {
+		chat.addResponse({
+			type: "msg",
+			text: "Our address is Whatever"
+		});
+
 		chat.addResponse({
 			type: "location",
 			location: {
@@ -297,8 +298,6 @@ function respond (message, cb) {
 	Route that responds to messages
 */
 app.get('/message', function (req, res) {
-	console.log("in message: ", chatbot);
-
 	chatbot.respond(req.query.message, function (response) {
 		console.log("responding");
 		res.json(response);/*.bind(res)*/
@@ -312,7 +311,7 @@ app.get('/message', function (req, res) {
 app.get('/reviews', function (req, res) {
 	var checkOnly = 10;
 
-	var reviews = require('./bad-mock-reviews.js');
+	var reviews = require('./mock-reviews.js');
 	var done = _.after(checkOnly, function () {
 		res.json(reviews.sortBy(function (review) {
 			review.sentiment.score = parseFloat(review.sentiment.score);

@@ -5,12 +5,17 @@
 body {
 	margin: 0px;
 	font-family: 'Open Sans', sans-serif;
+	// font-size: 16px;
 }
 
 ul {
 	list-style: none;
 	margin: 0px;
 	padding: 0px;
+
+	li {
+		padding: 0px;
+	}
 }
 
 #header {
@@ -33,7 +38,71 @@ ul {
 }
 
 #chat {
-	margin-bottom: 80px;
+	overflow: hidden;
+	padding-top: 20px;
+	margin-bottom: 100px;
+
+	ul {
+		margin-left: 50px;
+		list-style-type: circle;
+	}
+
+	.calendar {
+		display: inline-block;
+		position: relative;
+		padding-left: 40px;
+		padding-right: 40px;
+
+		.avail {
+			background: rgb(195, 232, 146);
+		}
+
+		.booked {
+			background: #ffa7a7;
+		}
+	
+		.previous, .next {
+			position: absolute;
+			top: 0px;
+			bottom: 0px;
+			padding-top: 100px;
+
+			text-align: center;
+			width: 40px;
+			font-size: 24px;
+			border: 1px solid #AAA;
+		}
+
+		.previous {
+			left: 0px;
+			border-right: none;
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+		}
+
+		.next {
+			right: 0px;
+			border-left: none;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+		}
+
+		table {
+			@border-color: #999;
+
+			border-left: 1px solid @border-color;
+			border-top: 1px solid @border-color;
+
+			td {
+				width: 50px;
+				text-align: center;
+				padding: 10px 0px;
+				border-right: 1px solid @border-color;
+				border-bottom: 1px solid @border-color;
+				margin: 0px;
+			}
+		}
+	}
 
 	.map {
 		height: 300px;
@@ -42,13 +111,21 @@ ul {
 		float: right;
 	}
 
+	.bot, .user {
+		clear: both;
+	}
+	
 	.bot {
-		text-align: right;
+		float: right;
+	}
+
+	.user {
+		float: left;
+		margin: 20px 0px;
 	}
 
 	.bot.msg {
 		font-weight: 600;
-		padding: 20px 0px;
 	}
 
 	.bot.msg:before {
@@ -67,8 +144,9 @@ ul {
   		color: @blue-light;
 		font-size: 3em;
 		line-height: 0.1em;
-		vertical-align: -0.6em;
 		margin-left: 0.25em;
+		margin-top: 0.6em;
+		float: right;
 	}
 
 	.bot.setRoomType {
@@ -92,6 +170,7 @@ ul {
 }
 
 #new-message {
+	box-sizing: border-box;
 	font-family: 'Open Sans', sans-serif;
 	font-size: 16px;
 	width: 600px;

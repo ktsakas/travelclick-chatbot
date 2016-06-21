@@ -20,11 +20,12 @@ AIapi.prototype.query = function (text) {
 	aiQuery.on('response', function (res) {
 
 		console.log(res.result);
-		console.log(res.result.action != "");
 
 		if (res.result.action == "" || res.result.actionIncomplete) {
 			self.emit("say", res.result.fulfillment.speech);
 		} else {
+			console.log("query action: " + res.result.action);
+			console.log("emit: " + res.result.parameters);
 			self.emit(res.result.action, res.result.parameters);
 		}
 

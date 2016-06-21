@@ -1,9 +1,38 @@
 var app = angular.module("chatbot", ['jsonFormatter']);
 
+var config = {
+    server: 'wss://api.api.ai:4435/api/ws/query',
+    token: 'e11f52814cbf49c3b34ed55f455ca11f',// Use Client access token there (see agent keys).
+    // sessionId: sessionId,
+    onInit: function () {
+        console.log("> ON INIT use config");
+    }
+};
+var apiAi = new ApiAi(config);
+apiAi.init();
+
+apiAi.onOpen = function () {
+    apiAi.startListening();
+};
+
 /*
 	Chat controller
 */
 app.controller("chatCtrl", function ($scope, $element, $http) {
+	$scope.dayRanges = [];
+	var avail = true;
+	for (var i= 0; i < 5; i++) {
+		$scope.dayRanges[i] = [];
+		for (var j= 0; j < 7; j++) {
+			$scope.dayRanges[i][j] = {
+				num: i*7 + j + 1,
+				class: avail ? "avail" : "booked"
+			};
+		}
+		avail = !avail;
+	}
+
+
 	$scope.messages = [];
 	$scope.disabled = false;
 
@@ -32,7 +61,14 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 			req: "I would like to book a room for one person."
 		}*/
 	];
-	var defMsg = "Is there anything else I could help you with?";
+	var defMsg = 
+	"Hey, I am a chatbot let me know if you need help with any of the following."
+	+ "<ul>"
+	+ "<li>Booking a room</li>"
+	+ "<li>Ask information about the hotel and our rooms</li>"
+	+ "<li>Ask about availability</li>"
+	+ "<li>Get our address or directions</li>"
+	+ "<li>Contact the hotel</li>";
 
 	function parseYesNo (msg) {
 		if (!msg) return false;
@@ -56,11 +92,11 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 
 			if (curMsg > engageMsgs.length) engaged = true;
 
-			$scope.messages.push({
+			/*$scope.messages.push({
 				text: nextQ,
 				type: "msg",
 				owner: "bot"
-			});
+			});*/
 
 			return null;
 		}
@@ -91,7 +127,7 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 		console.log($scope.messages);
 	}
 
-	$http.get("/reset", { params: {} });
+	// $http.get("/reset", { params: {} });
 	engage();
 });
 
@@ -104,15 +140,13 @@ app.controller("msgCtrl", function ($scope, $element) {
 	console.log($scope.msg.type);
 	if ($scope.msg.type == 'location' || $scope.msg.type == 'directions') {
 		map = new google.maps.Map($element[0].getElementsByClassName("map")[0], {
-            zoom: 12,
+            zoom: 13,
             center: $scope.msg.location,
             disableDefaultUI: true
         });
 	}
 
 	if ($scope.msg.type == "location") {
-		console.log($scope.msg.location);
-
         var marker = new google.maps.Marker({
             position: $scope.msg.location,
             map: map,
@@ -139,5 +173,8 @@ app.controller("msgCtrl", function ($scope, $element) {
                 window.alert('Directions request failed due to ' + status);
             }
         });
+	} else if ($scope.msg.type == 'availability') {
+		console.log('avail');
+		// $element.getElementsByName()
 	}
 });
