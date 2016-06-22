@@ -12,6 +12,10 @@
     </head>
     <body ng-app="chatbot" ng-controller="chatCtrl">
         
+       
+
+        <br /><br/>
+
     	<div id="header">
     	<div class="center">
     		TravelClick Chatbot Assistant
@@ -78,6 +82,21 @@
                     </tbody>
                     </table>
                     <a class="next">&#x203A;</a>
+                </div>
+                
+                <ul ng-show="msg.type == 'rooms'" class="rooms">
+                    <li ng-repeat="room in msg.rooms">
+                    <div>{{room.roomTypeName}}</div>
+                    <img src="http://placehold.it/150x120" />
+                    <div>for {{room.maxOccupancy}} people</div>
+                    </li>
+                </ul>
+
+                <div ng-show="msg.type == 'directions-steps'" class="steps">
+                    <div ng-repeat="step in msg.steps">
+                        <span style="position: relative; margin-right: 19px;"><i class="adp-maneuver adp-{{step.maneuver}}"></i></span>
+                        <span ng-bind-html="step.instructions | unsafe"></span>
+                    </div>
                 </div>
 
                 <span ng-show="msg.type == 'setDates'">

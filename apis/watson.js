@@ -30,6 +30,7 @@ var WatsonAPI = {
 		return this.language_translation.identify({
 			text: text
 		}, function (err, detected) {
+			console.log(err);
 			var lang = detected.languages[0].language;
 
 			cb(err, lang);

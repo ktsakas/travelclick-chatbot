@@ -15,6 +15,12 @@ apiAi.onOpen = function () {
     apiAi.startListening();
 };
 
+app.filter('unsafe', function($sce) {
+    return function(val) {
+        return $sce.trustAsHtml(val);
+    };
+});
+
 /*
 	Chat controller
 */
@@ -158,14 +164,22 @@ app.controller("msgCtrl", function ($scope, $element) {
         directionsDisplay.setMap(map);
 
         directionsService.route({
-            origin: {
+            /*origin: {
                 lat: 37.8386741,
                 lng: -122.2936934
-            },
-            destination: "Sacramento",
+            },*/
+            origin: "JFK Airport",
+            destination: "Port Authority Bus Terminal",
             travelMode: google.maps.TravelMode.DRIVING
         }, function(response, status) {
-            console.log(response, status);
+        	var steps = response.routes[0].legs[0].steps;
+        	console.log("legs: ", response.routes[0].legs);
+            $scope.messages.push({
+            	owner: "bot",
+            	type: "directions-steps",
+            	steps: steps
+            });
+            $scope.$apply();
 
             if (status === google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(response);
@@ -176,5 +190,9 @@ app.controller("msgCtrl", function ($scope, $element) {
 	} else if ($scope.msg.type == 'availability') {
 		console.log('avail');
 		// $element.getElementsByName()
+	} else if ($scope.msg.type == 'rooms') {
+		console.log('rooms');
+	} else if ($scope.msg.type == 'directions-steps') {
+		console.log('directions-steps');
 	}
 });
