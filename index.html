@@ -14,8 +14,6 @@
         
        
 
-        <br /><br/>
-
     	<div id="header">
     	<div class="center">
     		TravelClick Chatbot Assistant
@@ -39,7 +37,7 @@
               </li>
 
     		  <li ng-controller="msgCtrl" ng-repeat="msg in messages" class="{{msg.owner}} {{msg.type}}">
-                <span ng-click="msg.showAnalysis = !msg.showAnalysis" ng-show="msg.type == 'msg'">
+                <span ng-click="msg.showAnalysis = !msg.showAnalysis" ng-show="msg.type == 'msg' || msg.type == 'prompt'">
                     {{msg.text}}
                 </span>
 
@@ -66,18 +64,19 @@
                     <table cellspacing="0">
                     <thead>
                         <tr>
+                            <td>Sun</td>
                             <td>Mon</td>
                             <td>Tue</td>
                             <td>Wed</td>
                             <td>Th</td>
                             <td>Fri</td>
                             <td>Sat</td>
-                            <td>Sun</td>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="dayRange in dayRanges">
-                            <td ng-repeat="day in dayRange" class="{{day.class}}">{{day.num}}</td>
+                        <tr ng-repeat="dayRange in dayRanges track by $index">
+                            <!-- <td>{{dayRange}}</td> -->
+                            <td ng-repeat="day in dayRange track by $index" class="{{day.class}}">{{day.num}}</td>
                         </tr>
                     </tbody>
                     </table>

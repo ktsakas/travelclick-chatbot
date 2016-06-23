@@ -24,23 +24,10 @@ app.filter('unsafe', function($sce) {
 /*
 	Chat controller
 */
-app.controller("chatCtrl", function ($scope, $element, $http) {
-	$scope.dayRanges = [];
-	var avail = true;
-	for (var i= 0; i < 5; i++) {
-		$scope.dayRanges[i] = [];
-		for (var j= 0; j < 7; j++) {
-			$scope.dayRanges[i][j] = {
-				num: i*7 + j + 1,
-				class: avail ? "avail" : "booked"
-			};
-		}
-		avail = !avail;
-	}
-
-
+app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 	$scope.messages = [];
 	$scope.disabled = false;
+	$scope.expectConfirm = false;
 
 	function showMessage (res) {
 		$scope.disabled = false;
@@ -54,6 +41,14 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 
 			$scope.messages.push(answers[i]);
 		}
+
+		$timeout(function () {
+			console.log("setting focus");
+			document.getElementById('new-message').focus();
+
+			var scroller = document.body;
+      		scroller.scrollTop = scroller.scrollHeight;
+		});
 	}
 
 	var engaged = false;
@@ -84,7 +79,7 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 		} else if (msg.match(/(no).*/i)) {
 			return false;
 		} else {
-			throw "Unknown answer!";
+			return null;
 		}
 	}
 
@@ -109,8 +104,11 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 	}
 
 	$scope.addMessage = function () {
-		$scope.disabled = true;
-		document.getElementById('new-message').value = "";
+		console.log("new msg confirm: ", $scope);
+		var lastMessage = $scope.messages[ $scope.messages.length - 1 ];
+		console.log("last message: ", lastMessage);
+		var sendMessage;
+
 		// Handle user message
 		$scope.messages.push({
 			text: $scope.newMessage,
@@ -119,31 +117,67 @@ app.controller("chatCtrl", function ($scope, $element, $http) {
 			showAnalysis: false
 		});
 
-		// Handle bot answer
-		var sendMessage;
-		if (!engaged) sendMessage = engage($scope.newMessage);
-		else sendMessage = $scope.newMessage;
+		if ($scope.expectConfirm) {
+			var confirm = parseYesNo($scope.newMessage);
+			if ( confirm === true ) {
+				$scope.expectConfirm = false;
+				$http.get("/message", {
+					params: { message: lastMessage.equiv }
+				}).then(showMessage);
+			} else if ( confirm === false ) {
+				console.log("false");
 
-		if (sendMessage) {
+				$scope.expectConfirm = false;
+				$scope.messages.push({
+					type: "msg",
+					owner: "bot",
+					text: "Ok, is there anything else I could help you with?"
+				});
+			} else if ( confirm === null ) {
+				$scope.messages.push({
+					type: "msg",
+					owner: "bot",
+					text: "Please answer yes or no."
+				})
+			}
+
+		} else {
+			$scope.disabled = true;
+			document.getElementById('new-message').value = "";
+
 			$http.get("/message", {
-				params: { message: sendMessage }
+				params: { message: $scope.newMessage }
 			}).then(showMessage);
 		}
 
-		console.log($scope.messages);
+		$timeout(function () {
+			var scroller = document.body;
+      		scroller.scrollTop = scroller.scrollHeight;
+		});
+
+		// console.log($scope.messages);
 	}
 
-	// $http.get("/reset", { params: {} });
+	console.log('resetting');
+	$http.get("/reset", { params: {} });
 	engage();
 });
 
+
+function dateToDay (dateStr) {
+	console.log(dateStr);
+	var parts = dateStr.split('-'),
+		date = new Date(+parts[0], parts[1] - 1, +parts[2]);
+
+	return date.getDay();
+}
 
 /*
 	Chat single message controller
 */
 app.controller("msgCtrl", function ($scope, $element) {
 	var map;
-	console.log($scope.msg.type);
+	console.log("message ctrl", $scope);
 	if ($scope.msg.type == 'location' || $scope.msg.type == 'directions') {
 		map = new google.maps.Map($element[0].getElementsByClassName("map")[0], {
             zoom: 13,
@@ -188,11 +222,31 @@ app.controller("msgCtrl", function ($scope, $element) {
             }
         });
 	} else if ($scope.msg.type == 'availability') {
-		console.log('avail');
-		// $element.getElementsByName()
+		$scope.dayRanges = new Array(6).fill([]).map(function () {
+			return new Array(7).fill({ num: 0, class: "empty" });
+		});
+
+		var startOffset = dateToDay($scope.msg.dates[0].date);
+		var totalDays = $scope.msg.dates.length;
+		for (var i= 0; i < totalDays; i++) {
+			var rangeIdx = Math.floor((startOffset + i) / 7);
+			var dayIdx = (startOffset + i) % 7;
+			// console.log('r: ' + rangeIdx + ', d: ' + dayIdx + ', ' + i);
+
+			$scope.dayRanges[rangeIdx][dayIdx] = {
+				num: i + 1,
+				class: $scope.msg.dates[i].isAvailable ? "avail" : "booked"
+			};
+			// console.log("r: " + rangeIdx, JSON.stringify($scope.dayRanges[rangeIdx]));
+		}
+		// console.log($scope.dayRanges);
 	} else if ($scope.msg.type == 'rooms') {
 		console.log('rooms');
 	} else if ($scope.msg.type == 'directions-steps') {
+
 		console.log('directions-steps');
+	} else if ($scope.msg.type == 'prompt') {
+		// Using $parent makes the override visisble on the chat scope
+		$scope.$parent.$parent.expectConfirm = true;
 	}
 });

@@ -15,21 +15,6 @@ var chatbot = new ChatBot();
 // Show all debug messages
 l.level = 'silly';
 
-/*
-	Import our API wrappers and libraries
-*/
-const WatsonAPI = require('./apis/watson.js'),
-	  BingAPI = require('./apis/bing.js'),
-	  TwilioAPI = require('./apis/twilio.js'),
-	  AIAPI = require('./apis/api_ai.js');
-	  AIapi = new AIAPI();
-
-const Chat = require('./sequential-chat.js'),
-	  chat = new Chat(),
-	  RoomAmenities = require('./lib/room-amenities.js'),
-	  HotelInfo = require('./lib/hotel-info.js'),
-	  Availability = require('./lib/availability.js');
-
 function parseCtxToQuery(context) {
 	var rooms = [];
 	var filters = [{

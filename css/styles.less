@@ -128,7 +128,7 @@ ul {
 }
 
 @keyframes msg-enter {
-	from { margin-top: 50px; opacity: 0; }
+	from { opacity: 0; }
 	to { }
 }
 
@@ -174,6 +174,12 @@ ul {
 		position: relative;
 		padding-left: 40px;
 		padding-right: 40px;
+		margin-top: 5px;
+		margin-bottom: 10px;
+	
+		.empty {
+			color: white;
+		}
 
 		.avail {
 			background: rgb(195, 232, 146);
@@ -187,7 +193,7 @@ ul {
 			position: absolute;
 			top: 0px;
 			bottom: 0px;
-			padding-top: 100px;
+			padding-top: 120px;
 
 			text-align: center;
 			width: 40px;
@@ -246,7 +252,12 @@ ul {
 		margin: 20px 0px;
 	}
 
-	.bot.msg {
+	.user:last-child {
+		margin-bottom: 0px;
+	}
+
+	.bot.msg,
+	.bot.prompt {
 		font-weight: 600;
 
 		ul {
@@ -255,7 +266,8 @@ ul {
 		}
 	}
 
-	.bot.msg:before {
+	.bot.msg:before,
+	.bot.prompt:before {
 		font-family: "Times New Roman";
   		content: "\201C";
   		color: @blue-light;
@@ -265,7 +277,8 @@ ul {
 		margin-right: 0.25em;
 	}
 
-	.bot.msg:after {
+	.bot.msg:after,
+	.bot.prompt:after {
 		font-family: "Times New Roman";
   		content: "\201D";
   		color: @blue-light;
