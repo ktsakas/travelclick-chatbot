@@ -1,5 +1,6 @@
-const EventEmitter = require('events').EventEmitter;
-const util = require('util');
+const EventEmitter = require('events').EventEmitter,
+	  util = require('util'),
+	  _ = require('underscore');
 
 const api_key = "3ec2ce2feba540869d5f9ff32bc6680c";
 const AI = require('apiai');
@@ -16,16 +17,27 @@ function AIapi () {
 
 util.inherits(AIapi, EventEmitter);
 
+AIapi.prototype.addParser = function (action, parserFn) {
+	if (!this.parsers[action]) this.parsers[action] = [];
+
+	this.parsers[action].push(parserFn);
+};
+
 AIapi.prototype.parse = function (action, params) {
 	if (this.parsers[action]) {
-		this.parsers[action]();
+		this.parsers[action].forEach((parser) => {
+			params = parser(_.clone(params));
+		});
 	}
-};
+
+	return params;
+}
 
 AIapi.prototype.query = function (text, params) {
 	var self = this;
 	this.lastMsg = text;
 	this.parsed = false;
+	console.log("querying with: ", params);
 	var contexts = [{
 		name: "extra",
 		parameters: params
@@ -34,18 +46,21 @@ AIapi.prototype.query = function (text, params) {
 
 	aiQuery.on('response', function (res) {
 
-		console.log(res.result);
+		console.log("result: ", res.result.contexts);
 
-		
+		params = res.result.parameters;
+		var parsed = self.parse(res.result.action, params),
+			paramsChanged = !_.isEqual(res.result.parameters, params);
 
-		if (res.result.action == "") {
+		console.log('action: ' + res.result.action, 'params: ', params, 'parsed: ',  parsed);
+
+		if (paramsChanged) {
+			console.log("params changed");
+			self.query(text, parsed);
+		} else if (res.result.actionIncomplete) {
 			self.emit("say", res.result.fulfillment.speech);
 		} else {
-			self.emit("parse-" + res.result.action, res.result.parameters);
-
-			var paramsChanged = !_.isEqual(res.result.parameters, params);
-			if (paramsChanged) self.query(text, res.result.parameters);
-			else if (res.result.actionIncomplete) self.emit("say", res.result.fulfillment.speech);
+			self.emit(res.result.action, parsed);
 		}
 
 		/*if (res.result.action == "" && res.result.actionIncomplete && this.parsed) {
