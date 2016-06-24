@@ -35,32 +35,38 @@ AIapi.prototype.parse = function (action, params) {
 
 AIapi.prototype.query = function (text, params) {
 	var self = this;
-	this.lastMsg = text;
-	this.parsed = false;
-	console.log("querying with: ", params);
+	/*console.log("querying with: ", params);
 	var contexts = [{
-		name: "extra",
+		name: "generic",
 		parameters: params
-	}];
-	var aiQuery = this.ai.textRequest(text, {contexts: contexts});
+	}];*/
+	var aiQuery = this.ai.textRequest(text);//, resetContexts: true});
 
 	aiQuery.on('response', function (res) {
 
-		console.log("result: ", res.result.contexts);
+		// console.log("result: ", res.result.contexts);
 
-		params = res.result.parameters;
-		var parsed = self.parse(res.result.action, params),
-			paramsChanged = !_.isEqual(res.result.parameters, params);
+		/*var contextParams = _(res.result.contexts).find((context) => {
+			return context.name == 'generic';
+		});
+		console.log("context params: ", contextParams.parameters);
+		console.log("resp params: ", res.result.parameters);
+		params = _.extend(res.result.parameters, contextParams.parameters);
+		console.log("results params: ", params);
+*/
+		/*var parsed = self.parse(res.result.action, params),
+			paramsChanged = !_.isEqual(params, parsed);
 
-		console.log('action: ' + res.result.action, 'params: ', params, 'parsed: ',  parsed);
+		console.log('action: ' + res.result.action, 'params: ', params, 'parsed: ',  parsed);*/
 
-		if (paramsChanged) {
+		/*if (paramsChanged) {
 			console.log("params changed");
 			self.query(text, parsed);
-		} else if (res.result.actionIncomplete) {
+		} else */
+		if (res.result.action == "" || res.result.actionIncomplete) {
 			self.emit("say", res.result.fulfillment.speech);
 		} else {
-			self.emit(res.result.action, parsed);
+			self.emit(res.result.action, res.result.parameters);
 		}
 
 		/*if (res.result.action == "" && res.result.actionIncomplete && this.parsed) {
@@ -130,5 +136,20 @@ aiApi.textRequest('I would like to book a room.', {
 		console.log(err);
 	});
 });*/
+
+var ai = new AI(api_key);
+ai.textRequest("I would like to book a room.", {
+	contexts: [{
+		name: "generic",
+		parameters: {
+			newthing: "hadsfa"
+		}
+	}],
+	sessionId: "00000000-1234-0000-0000-000000000000", 
+	resetContexts: true
+}).on('response', function (res) {
+	// console.log("response: ", res);
+	// console.log("response contexts: ", res.result.contexts);
+}).end();
 
 module.exports = AIapi;
