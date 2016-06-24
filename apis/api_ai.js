@@ -11,6 +11,7 @@ function AIapi () {
 	this.params = {};
 	this.lastMsg = "";
 	this.parsers = {};
+	this.resetContexts = true;
 
 	return this;
 }
@@ -40,7 +41,8 @@ AIapi.prototype.query = function (text, params) {
 		name: "generic",
 		parameters: params
 	}];*/
-	var aiQuery = this.ai.textRequest(text);//, resetContexts: true});
+	var aiQuery = this.ai.textRequest(text, {resetContexts: this.resetContexts});
+	this.resetContexts = false;
 
 	aiQuery.on('response', function (res) {
 
@@ -63,10 +65,12 @@ AIapi.prototype.query = function (text, params) {
 			console.log("params changed");
 			self.query(text, parsed);
 		} else */
+		console.log(res.result);
 		if (res.result.action == "" || res.result.actionIncomplete) {
 			self.emit("say", res.result.fulfillment.speech);
 		} else {
 			self.emit(res.result.action, res.result.parameters);
+			if (res.result.fulfillment.speech) self.emit("say", res.result.fulfillment.speech);
 		}
 
 		/*if (res.result.action == "" && res.result.actionIncomplete && this.parsed) {

@@ -175,7 +175,7 @@ function dateToDay (dateStr) {
 /*
 	Chat single message controller
 */
-app.controller("msgCtrl", function ($scope, $element) {
+app.controller("msgCtrl", function ($scope, $element, $location) {
 	var map;
 	console.log("message ctrl", $scope);
 	if ($scope.msg.type == 'location' || $scope.msg.type == 'directions') {
@@ -248,5 +248,7 @@ app.controller("msgCtrl", function ($scope, $element) {
 	} else if ($scope.msg.type == 'prompt') {
 		// Using $parent makes the override visisble on the chat scope
 		$scope.$parent.$parent.expectConfirm = true;
+	} else if ($scope.msg.type == 'redirect') {
+		window.location = $scope.msg.url;
 	}
 });
