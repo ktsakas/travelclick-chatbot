@@ -121,7 +121,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 			var confirm = parseYesNo($scope.newMessage);
 			if ( confirm === true ) {
 				$scope.expectConfirm = false;
-				$http.get("/message", {
+				$http.get("/chat", {
 					params: { message: lastMessage.equiv }
 				}).then(showMessage);
 			} else if ( confirm === false ) {
@@ -145,7 +145,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 			$scope.disabled = true;
 			document.getElementById('new-message').value = "";
 
-			$http.get("/message", {
+			$http.get("/chat", {
 				params: { message: $scope.newMessage }
 			}).then(showMessage);
 		}
@@ -187,6 +187,7 @@ app.controller("msgCtrl", function ($scope, $element, $location) {
 	}
 
 	if ($scope.msg.type == "location") {
+		console.log("location: ", $scope.msg.location);
         var marker = new google.maps.Marker({
             position: $scope.msg.location,
             map: map,
