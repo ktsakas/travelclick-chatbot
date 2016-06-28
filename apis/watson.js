@@ -22,7 +22,8 @@ var WatsonAPI = {
 		return this.alchemy_language.sentiment({
 			text: text
 		}, function (err, response) {
-			cb(err, response.language, response.docSentiment);
+			if (err) cb(err, null, null);
+			else cb(null, response.language, response.docSentiment);
 		});
 	},
 
@@ -41,7 +42,8 @@ var WatsonAPI = {
 		return this.language_translation.translate({
 			text: text, source: 'en', target: to
 		}, function (err, res) {
-			cb(err, res.translations[0].translation);
+			if (err) cb(err, null);
+			else cb(null, res.translations[0].translation);
 		});
 	},
 
