@@ -145,10 +145,11 @@ app.get('/reviews', function (req, res) {
 */
 app.get('/reset', function (req, res) {
 	// console.log("resetting");
-	// chatbot = new ChatBot();
+	witchat = new WitChat();
 });
 
 /*
 	Start the app
 */
-app.listen(port, () => l.info("Chatbot listening on 127.0.0.1:" + port));
+app.use('/', require('./mock_api.js'))
+   .listen(port, () => l.info("Chatbot listening on 127.0.0.1:" + port));

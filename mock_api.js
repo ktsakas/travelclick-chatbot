@@ -175,4 +175,5 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 	res.json(result);
 });
 
-app.listen(9898, () => l.info("Mock api listening on 127.0.0.1:" + 9898));
+module.exports = app;
+// app.listen(9898, () => l.info("Mock api listening on 127.0.0.1:" + 9898));
