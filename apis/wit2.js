@@ -35,56 +35,6 @@ function WitAPI (token) {
 
 util.inherits(WitAPI, EventEmitter);
 
-WitAPI.prototype.query = function (text, params) {
-	var self = this;
-	console.log("query: ", self.context);
-
-	this.req.post({
-		url: "/converse",
-		qs: _.defaults({ q: text }, this.queryData),
-		form: self.context
-	}, function (err, res, body) {
-		console.log("res: ", res);
-		body = JSON.parse(body);
-
-		if (body.type == "msg") {
-			self.emit('say', body.msg);
-		} else if (body.type == "merge") {
-			self.emit('merge', body.entities, self.context);
-			self.query(text, params);
-		} else  if (body.type == "action") {
-			self.emit(body.action, self.context);
-		} else if (body.type == "stop") return;
-	});
-};
-
-/*var readline = require('readline'),
-	rl = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout
-	});
-
-var wit = new WitAPI('LVQPYAXDQYWKFRSORXCCN3YR23S5AUQE');
-
-wit.query("I would like to book a room.");
-wit.on("merge", function (entities, context) {
-	console.log(context);
-	if (entities.intent) context.intent = entities.intent[0].value;
-
-	// Parse date
-	if (entities.dateIn) {
-		context.dateIn = entities.dateIn[0].value.split('T')[0];
-	}
-})
-
-wit.on("say", function (msg) {
-	rl.question(msg, (answer) => {
-		wit.query(answer);
-	});
-});
-
-wit.on("book", function (context) {});*/
-
 WitAPI.prototype.action = function (action, fn) {
 	this.actions[action] = fn;
 };
@@ -100,34 +50,37 @@ WitAPI.prototype.callAction = function (action, args, cb) {
 WitAPI.prototype.query = function (text) {
 	var self = this;
 
-	console.log("querying", self.context, " text", _.defaults(text ? { q: text } : {}, this.queryData));
+	console.log("querying with: ", self.context, text);
 	this.req.post({
 		url: "/converse",
 		qs: _.defaults(text ? { q: text } : {}, this.queryData),
 		body: JSON.stringify(self.context)
 	}, function (err, res, body) {
 		body = JSON.parse(body);
-		console.log("BODY TYPE: " + body.type);
-		console.log("CALLING ACTION: " + body.action);
 
-		if (body.type == "msg") {
-			// console.log("Message...");
-			self.callAction('say', body.msg);
-			self.query();
-		} else if (body.type == "merge") {
-			console.log("merge body: ", body);
-			self.callAction('merge', body.entities || {}, self.context, function (mergedCtx) {
+		 if (body.type == "merge") {
+		 	console.log("MERGING");
+			// console.log("merge body: ", body);
+			self.callAction('merge', text, body.entities || {}, self.context, function (mergedCtx) {
 				self.context = mergedCtx;
+				// console.log("merged ctx", self.context);
+
 				self.query();
 			});
+		} else if (body.type == "msg") {
+		 	console.log("SAYING", body.msg);
+			self.callAction('say', body.msg);
+			self.query(text);
 		} else if (body.type == "action") {
+		 	console.log("ACTION" + body.action);
 			self.callAction(body.action, self.context, function (newCtx) {
-				console.log("action ctx: ", self.context);
-
 				self.context = newCtx;
-				self.query();
+
+				// console.log("action ctx: ", self.context);
+				self.query(text);
 			});
 		} else if (body.type == "stop") {
+		 	console.log("STOPPING");
 			console.log(self.context);
 			self.callAction('stop');
 			return;
