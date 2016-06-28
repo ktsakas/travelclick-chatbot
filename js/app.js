@@ -226,6 +226,7 @@ app.controller("msgCtrl", function ($scope, $element, $location) {
 			return new Array(7).fill({ num: 0, class: "empty" });
 		});
 
+		console.log($scope.msg);
 		var startOffset = dateToDay($scope.msg.dates[0].date);
 		var totalDays = $scope.msg.dates.length;
 		for (var i= 0; i < totalDays; i++) {

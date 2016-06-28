@@ -23,6 +23,7 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "express-json": "^1.0.0",
+    "faker": "^3.1.0",
     "moment": "^2.13.0",
     "node-bing-api": "^2.4.1",
     "node-fetch": "^1.5.1",
