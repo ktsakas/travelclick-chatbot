@@ -9,8 +9,10 @@ const l = require('winston'),
 	  bodyParser = require('body-parser'),
 	  app = express(),
 	  ChatBot = require('./lib/chatbot.js'),
+	  WitChat = require('./lib/chatbot2.js'),
 	  port = process.env.PORT || 8080;
 var chatbot = new ChatBot();
+var witchat = new WitChat();
 
 // Show all debug messages
 l.level = 'silly';
@@ -83,6 +85,14 @@ app.use(express.static('.'))
    .use(bodyParser.urlencoded({ extended: false }));
 
 
+
+app.get('/chat', function (req, res) {
+	witchat.respond(req.query.message, function (response) {
+		console.log("chatting");
+		res.json(response);
+	});
+});
+
 /*
 	Route that responds to messages
 */
@@ -134,8 +144,8 @@ app.get('/reviews', function (req, res) {
 	Reset the chat (it's called whenever the page is reloaded)
 */
 app.get('/reset', function (req, res) {
-	console.log("resetting");
-	chatbot = new ChatBot();
+	// console.log("resetting");
+	// chatbot = new ChatBot();
 });
 
 /*

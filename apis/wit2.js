@@ -9,7 +9,7 @@ const l = require('winston'),
 l.level = 'silly';
 
 function WitAPI (token) {
-	var version = "20160516";
+	var version = '20160516';
 
 	this.queryData = {
 		v: version,
@@ -20,15 +20,15 @@ function WitAPI (token) {
 		baseUrl: 'https://api.wit.ai',
 		headers: {
 			'Authorization': 'Bearer ' + token,
-			'Accept': 'application/vnd.wit.' + version + '+json',
-			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
 		}
 	});
 
 	this.context = {};
 
 	// this.actions = actions;
-	this.stopped = false;
+	this.actions = {};
 
 	return this;
 }
@@ -58,7 +58,7 @@ WitAPI.prototype.query = function (text, params) {
 	});
 };
 
-var readline = require('readline'),
+/*var readline = require('readline'),
 	rl = readline.createInterface({
 		input: process.stdin,
 		output: process.stdout
@@ -83,6 +83,56 @@ wit.on("say", function (msg) {
 	});
 });
 
-wit.on("book", function (context) {});
+wit.on("book", function (context) {});*/
+
+WitAPI.prototype.action = function (action, fn) {
+	this.actions[action] = fn;
+};
+
+WitAPI.prototype.callAction = function (action, args, cb) {
+	if (!this.actions[action]) throw "Action " + action + " does not exist!";
+
+	var restArgs = Array.prototype.slice.call(arguments, [1]);
+	// console.log("rest args: ", restArgs);
+	this.actions[action].apply(this, restArgs);
+};
+
+WitAPI.prototype.query = function (text) {
+	var self = this;
+
+	// console.log("querying", self.context);
+	this.req.post({
+		url: "/converse",
+		qs: _.defaults(text ? { q: text } : {}, this.queryData),
+		body: JSON.stringify(self.context)
+	}, function (err, res, body) {
+		body = JSON.parse(body);
+		console.log("BODY TYPE: " + body.type);
+		console.log("CALLING ACTION: " + body.action);
+
+		if (body.type == "msg") {
+			// console.log("Message...");
+			self.callAction('say', body.msg);
+			self.query();
+		} else if (body.type == "merge") {
+			console.log("merge body: ", body);
+			self.callAction('merge', body.entities || {}, self.context, function (mergedCtx) {
+				self.context = mergedCtx;
+				self.query();
+			});
+		} else if (body.type == "action") {
+			self.callAction(body.action, self.context, function (newCtx) {
+				console.log("action ctx: ", self.context);
+
+				self.context = newCtx;
+				self.query();
+			});
+		} else if (body.type == "stop") {
+			console.log(self.context);
+			self.callAction('stop');
+			return;
+		}
+	});
+}
 
 module.exports = WitAPI;
