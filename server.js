@@ -10,7 +10,7 @@ const l = require('winston'),
 	  app = express(),
 	  ChatBot = require('./lib/chatbot.js'),
 	  WitChat = require('./lib/chatbot2.js'),
-	  port = process.env.PORT || 8080;
+	  port = process.env.PORT || 3000;
 var chatbot = new ChatBot();
 var witchat = new WitChat();
 
@@ -145,10 +145,11 @@ app.get('/reviews', function (req, res) {
 */
 app.get('/reset', function (req, res) {
 	// console.log("resetting");
-	// chatbot = new ChatBot();
+	witchat = new WitChat();
 });
 
 /*
 	Start the app
 */
-app.listen(port, () => l.info("Chatbot listening on 127.0.0.1:" + port));
+app.use('/', require('./mock_api.js'))
+   .listen(port, () => l.info("Chatbot listening on 127.0.0.1:" + port));
