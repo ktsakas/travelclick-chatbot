@@ -4,7 +4,7 @@ l.level = 'silly';
 const fetch = require('node-fetch');
 const uuid = require('node-uuid');
 const EventEmitter = require('events').EventEmitter;
-const DEFAULT_API_VERSION = '20160516';
+const DEFAULT_API_VERSION = '20160629';
 
 function WitAPI (token) {
 	const baseURL = process.env.WIT_URL || 'https://api.wit.ai';
