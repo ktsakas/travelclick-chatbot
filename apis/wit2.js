@@ -9,7 +9,7 @@ const l = require('winston'),
 l.level = 'silly';
 
 function WitAPI (token) {
-	var version = '20160630';
+	var version = '20160705';
 
 	this.queryData = {
 		v: version,
