@@ -28,11 +28,31 @@
                 Hey, I am a chatbot. <br />
                 Let me know if you need help with any of the following:
                     <ul>
-                        <li>Booking a room</li>
-                        <li>Ask information about the hotel and our rooms</li>
-                        <li>Ask about availability</li>
-                        <li>Get our address or directions</li>
-                        <li>Contact the hotel</li>
+                        <li>
+                            <a ng-click="sendMessage('I want to book a room.')">
+                                Booking a room
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="sendMessage('What is your phone number?')">
+                                Ask information about the hotel and our rooms
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="sendMessage('What is your availability in July?')">
+                                Ask about availability
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="sendMessage('How do I get there from Boston?')">
+                                Get our address or directions
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="sendMessage('Call the hotel.')">
+                                Contact the hotel
+                            </a>
+                        </li>
                     </ul>
               </li>
 

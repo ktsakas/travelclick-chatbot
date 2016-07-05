@@ -72,7 +72,6 @@ WitAPI.prototype.query = function (text) {
 			self.callAction('say', body.msg);
 			self.query();
 		} else if (body.type == "action") {
-		 	console.log("ACTION" + body.action);
 			self.callAction(body.action, self.context, body.entities || {}, function (newCtx) {
 				self.context = newCtx;
 

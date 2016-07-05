@@ -103,6 +103,11 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 		}
 	}
 
+	$scope.sendMessage = function (msg) {
+		$scope.newMessage = msg;
+		$scope.addMessage();
+	};
+
 	$scope.addMessage = function () {
 		console.log("new msg confirm: ", $scope);
 		var lastMessage = $scope.messages[ $scope.messages.length - 1 ];
@@ -143,10 +148,11 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 
 		} else {
 			$scope.disabled = true;
-			document.getElementById('new-message').value = "";
+			var msg = $scope.newMessage;
+			$scope.newMessage = "";
 
 			$http.get("/chat", {
-				params: { message: $scope.newMessage }
+				params: { message: msg }
 			}).then(showMessage);
 		}
 
