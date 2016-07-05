@@ -166,6 +166,8 @@ a:hover {
 
 		li {
 			display: inline-block;
+			float: left;
+			width: 180px;
 			margin-left: 10px;
 			border: 1px solid #CCC;
 			border-radius: 5px;
@@ -175,6 +177,33 @@ a:hover {
 				padding: 5px 0px;
 				text-align: center;
 			}
+
+			.roomName {
+				height: 3em;
+
+				span {
+					display: table-cell;
+					width: 180px;
+					height: 3em;
+					vertical-align: middle;
+				}
+			}
+		}
+
+		button {
+			width: 100%;
+			border: none;
+			padding: 10px 5px;
+			color: white;
+			background-color: #003b64;
+		}
+
+		.availButton {
+			background-color: #066400;
+		}
+
+		.bookButton {
+			background-color: #003b64;
 		}
 	}
 

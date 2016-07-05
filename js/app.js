@@ -103,8 +103,10 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 		}
 	}
 
-	$scope.sendMessage = function (msg) {
+	$scope.sendMessage = function (msg, equiv) {
 		$scope.newMessage = msg;
+		$scope.equiv = equiv;
+
 		$scope.addMessage();
 	};
 
@@ -149,10 +151,12 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 		} else {
 			$scope.disabled = true;
 			var msg = $scope.newMessage;
+			var equiv = $scope.equiv;
 			$scope.newMessage = "";
+			$scope.equiv = null;
 
 			$http.get("/chat", {
-				params: { message: msg }
+				params: { message: msg, equiv: equiv }
 			}).then(showMessage);
 		}
 

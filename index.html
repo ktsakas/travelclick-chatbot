@@ -61,6 +61,8 @@
                     {{msg.text}}
                 </span>
 
+                <!-- <button>Yes</button><button>No</button> -->
+
                 <json-formatter ng-show="msg.owner == 'user' && msg.showAnalysis" json="msg.analysis" open="5"></json-formatter>
 
                 <span ng-show="msg.type == 'setRoomType'">
@@ -105,9 +107,16 @@
                 
                 <ul ng-show="msg.type == 'rooms'" class="rooms">
                     <li ng-repeat="room in msg.rooms">
-                    <div>{{room.roomTypeName}}</div>
-                    <img src="http://placehold.it/150x120" />
-                    <div>for {{room.maxOccupancy}} people</div>
+                        <div class="roomName"><span>{{room.roomTypeName}}</span></div>
+                        <img src="http://placehold.it/180x120" />
+                        <div>for {{room.maxOccupancy}} people</div>
+                        
+                        <button class="availButton" ng-show="msg.availButton" ng-click="sendMessage('Show me your availability for the &quot;' + room.roomTypeName + '&quot;', room)">
+                            Availability
+                        </button>
+                        <button class="bookButton" ng-show="msg.bookButton"  ng-click="sendMessage('Book me the &quot;' + room.roomTypeName + '&quot; room', room)">
+                            Book
+                        </button>
                     </li>
                 </ul>
 

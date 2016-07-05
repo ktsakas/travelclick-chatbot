@@ -62,7 +62,7 @@ WitAPI.prototype.query = function (text) {
 		 if (body.type == "merge") {
 		 	console.log("MERGING");
 			// console.log("merge body: ", body);
-			self.callAction('merge', text, self.context, body.entities || {}, function (mergedCtx) {
+			self.callAction('merge', self.context, body.entities || {}, function (mergedCtx) {
 				self.context = mergedCtx;
 
 				self.query();
