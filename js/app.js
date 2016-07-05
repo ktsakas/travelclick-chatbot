@@ -155,6 +155,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 			$scope.newMessage = "";
 			$scope.equiv = null;
 
+			console.log("message equiv: ", equiv);
 			$http.get("/chat", {
 				params: { message: msg, equiv: equiv }
 			}).then(showMessage);

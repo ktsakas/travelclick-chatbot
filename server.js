@@ -87,7 +87,9 @@ app.use(express.static('.'))
 
 
 app.get('/chat', function (req, res) {
-	witchat.respond(req.query.message, req.query.equiv, function (response) {
+	var equiv = req.query.equiv ? JSON.parse(req.query.equiv) : {};
+
+	witchat.respond(req.query.message, equiv, function (response) {
 		res.json(response);
 	});
 });
