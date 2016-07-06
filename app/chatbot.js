@@ -16,10 +16,10 @@ const moment = require('moment');
 l.level = 'silly';
 
 // Import our API wrappers and libraries
-const WatsonAPI = require('../apis/watson.js'),
-	  BingAPI = require('../apis/bing.js'),
-	  TwilioAPI = require('../apis/twilio.js'),
-	  AIAPI = require('../apis/api_ai.js');
+const WatsonAPI = require('../apis/vendor/watson.js'),
+	  BingAPI = require('../apis/vendor/bing.js'),
+	  TwilioAPI = require('../apis/vendor/twilio.js'),
+	  AIAPI = require('../apis/vendor/api_ai.js');
 
 
 const RoomAmenities = require('./room-amenities.js'),

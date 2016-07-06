@@ -9,7 +9,7 @@ const l = require('winston'),
 l.level = 'silly';
 
 function WitAPI (token) {
-	var version = '20160705';
+	var version = '20160706';
 
 	this.queryData = {
 		v: version,
@@ -62,7 +62,7 @@ WitAPI.prototype.query = function (text) {
 		 if (body.type == "merge") {
 		 	console.log("MERGING");
 			// console.log("merge body: ", body);
-			self.callAction('merge', self.context, body.entities || {}, function (mergedCtx) {
+			self.callAction('merge', text, self.context, body.entities || {}, function (mergedCtx) {
 				self.context = mergedCtx;
 
 				self.query();
@@ -72,7 +72,7 @@ WitAPI.prototype.query = function (text) {
 			self.callAction('say', body.msg);
 			self.query();
 		} else if (body.type == "action") {
-			self.callAction(body.action, self.context, body.entities || {}, function (newCtx) {
+			self.callAction(body.action, text, self.context, body.entities || {}, function (newCtx) {
 				self.context = newCtx;
 
 				// console.log("action ctx: ", self.context);

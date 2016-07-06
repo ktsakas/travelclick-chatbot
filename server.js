@@ -8,10 +8,10 @@ const l = require('winston'),
 	  async = require('async'),
 	  bodyParser = require('body-parser'),
 	  app = express(),
-	  ChatBot = require('./lib/chatbot.js'),
-	  WitChat = require('./lib/chatbot2.js'),
+	  // ChatBot = require('./app/chatbot.js'),
+	  WitChat = require('./app/chatbot2.js'),
 	  port = process.env.PORT || 3000;
-var chatbot = new ChatBot();
+// var chatbot = new ChatBot();
 var witchat = new WitChat();
 
 // Show all debug messages
@@ -80,7 +80,7 @@ function queryRooms(searchAmenity, cb) {
 
 
 // Express.js
-app.use(express.static('.'))
+app.use(express.static('./public'))
    .use(bodyParser.json())
    .use(bodyParser.urlencoded({ extended: false }));
 
@@ -97,12 +97,12 @@ app.get('/chat', function (req, res) {
 /*
 	Route that responds to messages
 */
-app.get('/message', function (req, res) {
+/*app.get('/message', function (req, res) {
 	chatbot.respond(req.query.message, function (response) {
 		console.log("responding");
-		res.json(response);/*.bind(res)*/
+		res.json(response);//.bind(res)
 	});
-});
+});*/
 
 
 /*
