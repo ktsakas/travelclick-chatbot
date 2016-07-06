@@ -27,7 +27,7 @@ module.exports = function (chat) {
 
 			if (!context.dateIn) context.askDateIn = true;
 			else if (!context.dateOut) context.askNights = true;
-			else if (!context.guests) context.askGuests = true;
+			else if (!context.roomId) context.askRoom = true;
 			else {
 				chat.addAnswer({
 					type: 'redirect',
@@ -57,8 +57,6 @@ module.exports = function (chat) {
 		},
 
 		directions: function (context, cb) {
-			context = chat.parseDirections(context, entities, cb);
-
 			if (!context.fromLocation) {
 				context.askFromLocation = true;
 
@@ -79,10 +77,9 @@ module.exports = function (chat) {
 			}
 		},
 
-		availability: function (context, cb) {
-			console.log("avail: ", entities);
-			context = chat.parseAvailability(context, entities, cb);
-			
+		availability: function (context, cb) {	
+			console.log("availability context: ", context);
+
 			if (!context.dateIn) {
 				context.askDates = true;
 				cb(context);
@@ -111,13 +108,7 @@ module.exports = function (chat) {
 						equiv: 'I would like to book a single.'
 					});*/
 
-					context = {
-						availSuccess: true,
-						dateIn: "2016-10-10",
-						dateOut: "2016-14-10",
-						roomType: "single",
-						guests: 1
-					};
+					context.availSuccess = true;
 
 					cb(context);
 				});
@@ -138,7 +129,7 @@ module.exports = function (chat) {
 				amenity: context.roomAmenity,
 				type: context.roomType
 			}, function (err, rooms) {
-				console.log(context);
+				console.log("rooms: ", rooms);
 
 				if (rooms.length >= 0) {
 					if (context.roomAmenity && context.roomType) {
@@ -155,10 +146,17 @@ module.exports = function (chat) {
 						);
 					}
 
+					console.log("rooms: ", rooms);
 					rooms = rooms.map(function (room) {
-						room.roomId = room.id;
-						return room;
+						var roomTypes = ['single', 'double', 'triple', 'quadruple'];
+
+						return {
+							roomId: room.id,
+							roomTypeName: room.roomTypeName,
+							roomType: roomTypes[ room.maxOccupancy - 1 ]
+						};
 					});
+					console.log("showing: ", rooms);
 
 					chat.addAnswer({
 						type: "rooms",
@@ -181,19 +179,16 @@ module.exports = function (chat) {
 		},
 
 		hotelInfo: function (context, cb) {
-			entities = chat.normalize(entities);
-			console.log("hotelInfo: ", entities);
-
-			HotelInfo.getInfo(1098, entities.hotelInfo, function (err, value) {
+			HotelInfo.getInfo(1098, context.hotelInfo, function (err, value) {
 				var response = { type: "msg" };
 
-				if (entities.hotelInfo == "phone") {
+				if (context.hotelInfo == "phone") {
 					response.text = "Our phone number is " + value;
-				} else if (entities.hotelInfo == "fax") {
+				} else if (context.hotelInfo == "fax") {
 					response.text = "Our fax is " + value;
-				} else if (entities.hotelInfo == "checkIn") {
+				} else if (context.hotelInfo == "checkIn") {
 					response.text = "Check in time is " + value;
-				} else if (entities.hotelInfo == "checkOut") {
+				} else if (context.hotelInfo == "checkOut") {
 					response.text = "Check out time is " + value;
 				}
 

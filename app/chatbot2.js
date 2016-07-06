@@ -115,12 +115,14 @@ ChatBot.prototype.setupActions = function () {
 
 				// Parse the dates
 				entities = self.parseDates(entities);
-
-				// Merge the normalized entities with the knownEntities ones
-				entities = _.extend(entities, this.knownEntities || {});
 			}
 
-			if (action == 'stop') console.log("this is the stop action");
+			// console.log("known entities: ", self.knownEntities);
+			// Merge the normalized entities with the knownEntities ones
+			entities = _.extend(entities || {}, self.knownEntities || {});
+
+			// console.log("entities: ", entities, self.knownEntities);
+
 			if (parsers[action]) {
 				// Parse the entities
 				parsers[action].call(self, text, context, entities, function (newCtx) {
@@ -175,6 +177,7 @@ ChatBot.prototype.respond = function (message, knownEntities, cb) {
 				}.bind(self)
 			);
 		} else {*/
+
 			self.once("respond", function (answers) {
 				response.answers = answers;
 				cb(response);

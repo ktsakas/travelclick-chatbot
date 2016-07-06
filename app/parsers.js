@@ -5,7 +5,7 @@ const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 var moment = require('moment');
 
 module.exports = {
-	merge: function (text, context, entities, cb) { return context; },
+	merge: function (text, context, entities, cb) { cb(context); },
 
 
 	availability: function (text, context, entities, cb) {
@@ -16,24 +16,9 @@ module.exports = {
 			entities.roomName = this.text.split("\"")[1];
 		}
 
-		if (entities.roomName) {
-			context.roomName = entities.roomName;
-		}
-
-		if (entities.roomId) {
-			console.log("room id exitsts");
-			context.roomId = entities.roomId;
-			// console.log("context: ", context);
-
-			RoomAmenities.getRoom(1098, context.roomId, function (err, room) {
-				var roomTypes = ['single', 'double', 'triple', 'quadruple'];
-
-				context.roomName = room.roomTypeName;
-				context.roomType = roomTypes[ room.maxOccupancy - 1 ];
-
-				console.log("gotten room: ", room);
-			});
-		}
+		if (entities.roomName) context.roomName = entities.roomName;
+		if (entities.roomId) context.roomId = entities.roomId;
+		if (entities.roomType) context.roomType = entities.roomType;
 
 		entities.nights = entities.number;
 		entities.guests = entities.number;
@@ -44,8 +29,8 @@ module.exports = {
 		if (!context.dateIn) {
 			// if (entities.dates.length == 0) this.addMessage("I expected a date. Could you repeat that?");
 
-			if (entities.dates[0]) context.dateIn = entities.dates[0];
-			if (entities.dates[1]) context.dateOut = entities.dates[1];
+			if (entities.dates && entities.dates[0]) context.dateIn = entities.dates[0];
+			if (entities.dates && entities.dates[1]) context.dateOut = entities.dates[1];
 		} else if (!context.dateOut) {
 			if (entities.dates.length > 0) {
 				context.dateOut = entities.dates[0];
@@ -75,20 +60,23 @@ module.exports = {
 			}*/
 		}
 
-		return context;
+		cb(context);
 	},
 
 
 	book: function (text, context, entities, cb) {
 		if (entities.intent) context.intent = entities.intent;
+		if (entities.roomName) context.roomName = entities.roomName;
+		if (entities.roomId) context.roomId = entities.roomId;
+
+		console.log("book: ", entities);
 
 		delete context.askDateIn;
-		delete context.askDateOut;
-		delete context.askGuests;
+		delete context.askNights;
+		delete context.askRoom;
 
 		entities.nights = entities.number;
 		entities.guests = entities.number;
-		console.log("parsing book context: ", context);
 
 		if (!context.dateIn) {
 			// if (entities.dates.length == 0) this.addMessage("I expected a date. Could you repeat that?");
@@ -122,16 +110,22 @@ module.exports = {
 			context.roomAmenity = entities.roomAmenity;
 		}
 
-		return context;
+		cb(context);
 	},
 
 	directions: function (text, context, entities, cb) {
-		delete askFromLocation;
+		delete context.askFromLocation;
 
 		if (entities.location) {
 			context.fromLocation = entities.location;
 		}
 
-		return context;
+		cb(context);
+	},
+
+	hotelInfo: function (text, context, entities, cb) {
+		context.hotelInfo = entities.hotelInfo;
+
+		cb(context);
 	}
 };

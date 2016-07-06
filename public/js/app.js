@@ -103,9 +103,9 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 		}
 	}
 
-	$scope.sendMessage = function (msg, equiv) {
+	$scope.sendMessage = function (msg, knownEntities) {
 		$scope.newMessage = msg;
-		$scope.equiv = equiv;
+		$scope.knownEntities = knownEntities;
 
 		$scope.addMessage();
 	};
@@ -157,7 +157,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 
 			console.log("message equiv: ", equiv);
 			$http.get("/chat", {
-				params: { message: msg, equiv: equiv }
+				params: { message: msg, knownEntities: this.knownEntities }
 			}).then(showMessage);
 		}
 

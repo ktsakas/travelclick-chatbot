@@ -12,7 +12,7 @@ var RoomAmenities = {
 		}, function (err, res, body) {
 			if (err) cb(err, false);
 			else {
-				console.log("gotten room");
+				// console.log("gotten room");
 
 				var rooms = JSON.parse(body).guestRooms;
 
