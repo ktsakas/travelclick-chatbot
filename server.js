@@ -12,7 +12,8 @@ const l = require('winston'),
 	  WitChat = require('./app/chatbot2.js'),
 	  port = process.env.PORT || 3000;
 // var chatbot = new ChatBot();
-var witchat = new WitChat();
+// var witchat = new WitChat();
+var chats = {};
 
 // Show all debug messages
 l.level = 'silly';
@@ -86,11 +87,15 @@ app.use(express.static('./public'))
 
 
 
-app.get('/chat', function (req, res) {
-	var knownEntities = req.query.knownEntities ? JSON.parse(req.query.knownEntities) : {};
-	console.log(knownEntities);
+app.get('/chat/:sessionId', function (req, res) {
+	var chat = chats[req.params.sessionId];
+	if (!chat) chat = chats[req.params.sessionId] = new WitChat();
 
-	witchat.respond(req.query.message, knownEntities, function (response) {
+	var knownEntities = req.query.knownEntities ? JSON.parse(req.query.knownEntities) : {};
+	
+
+	console.log("from session: ", req.params.sessionId);
+	chats[req.params.sessionId].respond(req.query.message, knownEntities, function (response) {
 		res.json(response);
 	});
 });
@@ -145,9 +150,8 @@ app.get('/reviews', function (req, res) {
 /*
 	Reset the chat (it's called whenever the page is reloaded)
 */
-app.get('/reset', function (req, res) {
-	// console.log("resetting");
-	witchat = new WitChat();
+app.get('/reset/:sessionId', function (req, res) {
+	chats[req.params.sessionId] = new WitChat();
 });
 
 /*

@@ -70,9 +70,9 @@
                     <li ng-repeat="room in msg.rooms track by $index">
                         <img ng-src="{{room.picture}}" /><br />
 
-                        {{room.roomName}}<br />
+                        {{room.roomTypeName}}<br />
 
-                        <button ng-click="setRoomType(room.roomCode, room.roomName)">
+                        <button ng-click="setRoomType(room.roomCode, room.roomTypeName)">
                             Choose
                         </button>
                     </li>
@@ -107,9 +107,11 @@
                 
                 <ul ng-show="msg.type == 'rooms'" class="rooms">
                     <li ng-repeat="room in msg.rooms">
-                        <div class="roomName"><span>{{room.roomTypeName}}</span></div>
-                        <img src="http://placehold.it/180x120" />
-                        <div>for {{room.maxOccupancy}} people</div>
+                        <div  ng-click="msg.intent && sendMessage('The &quot;' + room.roomTypeName + '&quot;', room);">
+                            <div class="roomName"><span>{{room.roomTypeName}}</span></div>
+                            <img src="http://placehold.it/180x120" />
+                            <div>for {{room.maxOccupancy}} people</div>
+                        </div>
                         
                         <button class="availButton" ng-show="msg.availButton" ng-click="sendMessage('Show me your availability for the &quot;' + room.roomTypeName + '&quot;', room)">
                             Availability

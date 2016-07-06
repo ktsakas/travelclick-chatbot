@@ -86,8 +86,8 @@ module.exports = function (chat) {
 			} else if (!context.dateOut) {
 				context.askDates = true;
 				cb(context);
-			} else if (!context.roomType) {
-				context.askRoomType = true;
+			} else if (!context.roomId) {
+				context.askRoom = true;
 				cb(context);
 			} else {
 				console.log("getting availability!");
@@ -108,7 +108,12 @@ module.exports = function (chat) {
 						equiv: 'I would like to book a single.'
 					});*/
 
+					delete context.dateIn;
+					delete context.dateOut;
+
 					context.availSuccess = true;
+
+					console.log("avail out: ", context);
 
 					cb(context);
 				});
@@ -129,7 +134,7 @@ module.exports = function (chat) {
 				amenity: context.roomAmenity,
 				type: context.roomType
 			}, function (err, rooms) {
-				console.log("rooms: ", rooms);
+				// console.log("rooms: ", rooms);
 
 				if (rooms.length >= 0) {
 					if (context.roomAmenity && context.roomType) {
@@ -146,25 +151,35 @@ module.exports = function (chat) {
 						);
 					}
 
-					console.log("rooms: ", rooms);
+					// console.log("rooms: ", rooms);
 					rooms = rooms.map(function (room) {
 						var roomTypes = ['single', 'double', 'triple', 'quadruple'];
 
 						return {
 							roomId: room.id,
 							roomTypeName: room.roomTypeName,
-							roomType: roomTypes[ room.maxOccupancy - 1 ]
+							roomType: roomTypes[ room.maxOccupancy - 1 ],
+							maxOccupancy: room.maxOccupancy
 						};
 					});
 					console.log("showing: ", rooms);
 
-					chat.addAnswer({
-						type: "rooms",
-						rooms: rooms,
-						action: context.intent,
-						bookButton: true,
-						availButton: true
-					});
+					if (!context.intent) {
+						chat.addAnswer({
+							type: "rooms",
+							rooms: rooms,
+							bookButton: true,
+							availButton: true
+						});
+					} else {
+						chat.addAnswer({
+							type: "rooms",
+							rooms: rooms,
+							action: context.intent,
+							bookButton: false,
+							availButton: false
+						});
+					}
 				} else {
 					var roomType = context.roomType || "room";
 					var amenitySuffix = context.roomAmenity ? " with " + context.roomAmenity : "";

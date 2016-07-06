@@ -1,4 +1,5 @@
 var app = angular.module("chatbot", ['jsonFormatter']);
+var sessionId = Math.floor(Math.random() * 1000000) + 1;
 
 var config = {
     server: 'wss://api.api.ai:4435/api/ws/query',
@@ -128,7 +129,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 			var confirm = parseYesNo($scope.newMessage);
 			if ( confirm === true ) {
 				$scope.expectConfirm = false;
-				$http.get("/chat", {
+				$http.get("/chat/" + sessionId, {
 					params: { message: lastMessage.equiv }
 				}).then(showMessage);
 			} else if ( confirm === false ) {
@@ -155,8 +156,8 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 			$scope.newMessage = "";
 			$scope.equiv = null;
 
-			console.log("message equiv: ", equiv);
-			$http.get("/chat", {
+			console.log("chat: ", sessionId);
+			$http.get("/chat/" + sessionId, {
 				params: { message: msg, knownEntities: this.knownEntities }
 			}).then(showMessage);
 		}
@@ -170,7 +171,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 	}
 
 	console.log('resetting');
-	$http.get("/reset", { params: {} });
+	// $http.get("/reset/" + sessionId, { params: {} });
 	engage();
 });
 

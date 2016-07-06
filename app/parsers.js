@@ -12,11 +12,11 @@ module.exports = {
 		if (entities.intent) context.intent = entities.intent;
 		// console.log("availability with equiv: ", entities, this.equiv);
 
-		if (!entities.roomName && !context.roomName) {
-			entities.roomName = this.text.split("\"")[1];
+		if (!entities.roomTypeName && !context.roomTypeName) {
+			entities.roomTypeName = this.text.split("\"")[1];
 		}
 
-		if (entities.roomName) context.roomName = entities.roomName;
+		if (entities.roomTypeName) context.roomTypeName = entities.roomTypeName;
 		if (entities.roomId) context.roomId = entities.roomId;
 		if (entities.roomType) context.roomType = entities.roomType;
 
@@ -24,7 +24,7 @@ module.exports = {
 		entities.guests = entities.number;
 
 		delete context.askDates;
-		delete context.askRoomType;
+		delete context.askRoom;
 
 		if (!context.dateIn) {
 			// if (entities.dates.length == 0) this.addMessage("I expected a date. Could you repeat that?");
@@ -60,13 +60,15 @@ module.exports = {
 			}*/
 		}
 
+		console.log("avail ctx: ", context);
+
 		cb(context);
 	},
 
 
 	book: function (text, context, entities, cb) {
 		if (entities.intent) context.intent = entities.intent;
-		if (entities.roomName) context.roomName = entities.roomName;
+		if (entities.roomTypeName) context.roomTypeName = entities.roomTypeName;
 		if (entities.roomId) context.roomId = entities.roomId;
 
 		console.log("book: ", entities);

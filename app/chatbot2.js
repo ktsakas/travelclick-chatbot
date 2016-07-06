@@ -31,8 +31,6 @@ function ChatBot () {
 	this.actions = new Actions(this);
 	this.ai = new WitAPI('2WM5BQU4ANG7KX3IXWIIOIS5ZDGEIMBC');
 
-	console.log("new ctx: ", this.ai.context);
-
 	this.setupActions();
 
 	return this;
