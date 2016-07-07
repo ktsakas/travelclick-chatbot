@@ -72,7 +72,7 @@ WitAPI.prototype.query = function (text) {
 			self.callAction('say', body.msg);
 			self.query();
 		} else if (body.type == "action") {
-			self.callAction(body.action, text, self.context, body.entities || {}, function (newCtx) {
+			self.callAction(body.action, self.context, function (newCtx) {
 				self.context = newCtx;
 
 				// console.log("action ctx: ", self.context);
@@ -85,6 +85,10 @@ WitAPI.prototype.query = function (text) {
 			return;
 		}
 	});
-}
+};
+
+WitAPI.prototype.reset = function (text) {
+	this.queryData.session_id = uuid.v1();
+};
 
 module.exports = WitAPI;

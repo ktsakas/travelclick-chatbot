@@ -16,7 +16,6 @@
 		// context = this.parseMerge();
 		context = this.parseBook(context, entities, cb);
 
-		if (!context.dateIn) context.askDateIn = true;
 		else if (!context.dateOut) context.askNights = true;
 		else if (!context.guests) context.askGuests = true;
 		else {

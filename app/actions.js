@@ -1,23 +1,34 @@
 const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 	  HotelInfo = require('../apis/travelclick/hotel-info.js'),
-	  Availability = require('../apis/travelclick/availability.js');
+	  Availability = require('../apis/travelclick/availability.js'),
+	  Parsers = require('./parsers');
 
 module.exports = function (chat) {
+	var parsers = new Parsers(chat);
+
 	return {
 		say: function (answer) {
 			chat.addMessage(answer);
 		},
 
-		merge: function (context, cb) {
+		merge: function (text, context, entities, cb) {
 			console.log('merging: ', entities, context);
 
-			if (context.availSuccess) {
-				context = {
-					askDateIn: true,
-					roomType: context.roomType,
-					guests: context.guests
-				};
+			if (entities.intent) {
+				context[entities.intent] = true;
 			}
+
+			if (context.book) {
+				context = parsers.book(text, context, entities);
+			} else if (context.availability) {
+				context = parsers.availability(text, context, entities);
+			} else if (context.directions) {
+				context = parsers.directions(text, context, entities);
+			} else if (context.hotelInfo) {
+				context = parsers.hotelInfo(text, context, entities);
+			}
+
+			console.log("BooK : ", context);
 
 			cb(context);
 		},
@@ -25,18 +36,13 @@ module.exports = function (chat) {
 		book: function (context, cb) {
 			console.log("book called", context);
 
-			if (!context.dateIn) context.askDateIn = true;
-			else if (!context.dateOut) context.askNights = true;
-			else if (!context.roomId) context.askRoom = true;
-			else {
-				chat.addAnswer({
-					type: 'redirect',
-					url: "https://www.paypal.com"
-				});
+			parsers.book(text, context, entities);
 
-				context.bookSuccess = true;
-			}
-
+			/*chat.addAnswer({
+				type: 'redirect',
+				url: "https://www.paypal.com"
+			});
+*/
 			cb(context);
 		},
 
@@ -121,11 +127,6 @@ module.exports = function (chat) {
 		},
 
 		call: function (context, cb) {
-			chat.addAnswer({
-				type: "msg",
-				text: "Calling the hotel..."
-			});
-
 			cb({});
 		},
 
@@ -214,12 +215,6 @@ module.exports = function (chat) {
 		},
 
 		text: function (context, cb) {
-			/*if (context == 'yes') {
-				chat.addMessage("Text sent successfully.");
-			} else {
-				chat.addMessage("Ok, I will not text the hotel.");
-			}*/
-
 			cb({});
 		},
 

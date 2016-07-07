@@ -29,7 +29,7 @@ function ChatBot () {
 	this.answers = [];
 	this.unsent = [];
 	this.actions = new Actions(this);
-	this.ai = new WitAPI('2WM5BQU4ANG7KX3IXWIIOIS5ZDGEIMBC');
+	this.ai = new WitAPI('S2AXZPXVMNSSMSBCGS3IFRO2FN2DFHC6');
 
 	this.setupActions();
 
@@ -104,33 +104,33 @@ ChatBot.prototype.setupActions = function () {
 	var self = this;
 
 	Object.keys(this.actions).forEach(function (action) {
-		if (action == 'say') return self.ai.action('say', self.actions.say);
- 		
-		self.ai.action(action, function (text, context, entities, cb) {
-			if (entities) {
-				// Normalize the entities first
-				entities = self.normalize(entities);
+		if (action == 'say') {
+			self.ai.action('say', self.actions.say);
 
-				// Parse the dates
-				entities = self.parseDates(entities);
-			}
+		} else if (action == 'merge') {
+			self.ai.action('merge', function (text, context, entities, cb) {
+				console.log("merge: ", text, context, entities, cb);
 
-			// console.log("known entities: ", self.knownEntities);
-			// Merge the normalized entities with the knownEntities ones
-			entities = _.extend(entities || {}, self.knownEntities || {});
+				if (entities) {
+					// Normalize the entities first
+					entities = self.normalize(entities);
 
-			// console.log("entities: ", entities, self.knownEntities);
+					// Parse the dates
+					entities = self.parseDates(entities);
+				}
+				console.log("mergin");
 
-			if (parsers[action]) {
-				// Parse the entities
-				parsers[action].call(self, text, context, entities, function (newCtx) {
-					// Call the action
-					self.actions[action](newCtx, cb);
-				});
-			} else {
-				self.actions[action](context, cb);
-			}
-		});
+				// Merge the normalized entities with the knownEntities ones
+				entities = _.extend(entities || {}, self.knownEntities || {});
+
+				console.log('mergin');
+
+				self.actions.merge(text, context, entities, cb);
+			});
+
+		} else {
+			self.ai.action(action, self.actions[action]);
+		}
 	});
 };
 
