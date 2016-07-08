@@ -83,7 +83,7 @@ ChatBot.prototype.parseDates = function (entities) {
 
 		if (entities.datetime[0].grain == "month") {
 			entities.dates[1] = 
-				moment(dates[0]).add(1, 'months').subtract(1, 'days').format('YYYY-MM-DD');
+				moment(entities.dates[0]).add(1, 'months').subtract(1, 'days').format('YYYY-MM-DD');
 		}
 	}
 

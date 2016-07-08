@@ -36,11 +36,11 @@ module.exports = function (chat) {
 		book: function (context, cb) {
 			console.log("book called", context);
 
-			/*chat.addAnswer({
+			chat.addAnswer({
 				type: 'redirect',
 				url: "https://www.paypal.com"
 			});
-*/
+
 			cb(context);
 		},
 
@@ -97,20 +97,12 @@ module.exports = function (chat) {
 				console.log("getting availability!");
 
 				Availability.get(Availability.parseOptions(context), function (err, available) {
-					// console.log("available: ", available);
-
 					chat.addMessage('Here is our availabilty: ');
 
 					chat.addAnswer({
 						type: 'availability',
 						dates: available
 					});
-
-					/*chat.addAnswer({
-						type: 'prompt',
-						text: 'Would you like to book a ' + context.roomType + '?',
-						equiv: 'I would like to book a single.'
-					});*/
 
 					delete context.dateIn;
 					delete context.dateOut;
