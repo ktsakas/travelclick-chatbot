@@ -50,7 +50,7 @@ WitAPI.prototype.callAction = function (action, args, cb) {
 WitAPI.prototype.query = function (text) {
 	var self = this;
 
-	// console.log("querying with: ", self.context, text);
+	console.log("querying with: ", self.context, text);
 	this.req.post({
 		url: "/converse",
 		qs: _.defaults(text ? { q: text } : {}, this.queryData),

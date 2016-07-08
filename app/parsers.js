@@ -7,16 +7,15 @@ var moment = require('moment');
 module.exports = function (chat) {
 	return {
 		availability: function (text, context, entities) {
-			if (!entities.roomTypeName && !context.roomTypeName) {
-				entities.roomTypeName = this.text.split("\"")[1];
-			}
-
 			if (entities.roomTypeName) context.roomTypeName = entities.roomTypeName;
 			if (entities.roomId) context.roomId = entities.roomId;
 			if (entities.roomType) context.roomType = entities.roomType;
 
 			entities.nights = entities.number;
 			entities.guests = entities.number;
+
+			delete context.askDates;
+			delete context.askRoom;
 
 			if (!context.dateIn) {
 				// if (entities.dates.length == 0) this.addMessage("I expected a date. Could you repeat that?");
@@ -52,7 +51,11 @@ module.exports = function (chat) {
 				}*/
 			}
 
-			console.log("avail ctx: ", context);
+			if (!context.dateIn || !context.dateOut) context.askDates = true;
+			else if (!context.roomId) context.askRoom = true;
+
+			/*delete context.availability;
+			context.book = true;*/
 
 			return context;
 		},
@@ -60,7 +63,9 @@ module.exports = function (chat) {
 
 		book: function (text, context, entities) {
 			if (entities.roomTypeName) context.roomTypeName = entities.roomTypeName;
-			if (entities.roomId) context.roomId = entities.roomId;
+			if (entities.roomId) {
+				context.roomId = entities.roomId;
+			}
 
 			console.log("book: ", entities);
 

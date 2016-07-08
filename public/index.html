@@ -107,7 +107,7 @@
                 
                 <ul ng-show="msg.type == 'rooms'" class="rooms">
                     <li ng-repeat="room in msg.rooms">
-                        <div  ng-click="msg.intent && sendMessage('The &quot;' + room.roomTypeName + '&quot;', room);">
+                        <div  ng-click="msg.selectable && sendMessage('The &quot;' + room.roomTypeName + '&quot;', room);">
                             <div class="roomName"><span>{{room.roomTypeName}}</span></div>
                             <img src="http://placehold.it/180x120" />
                             <div>for {{room.maxOccupancy}} people</div>

@@ -94,7 +94,7 @@ app.get('/chat/:sessionId', function (req, res) {
 	var knownEntities = req.query.knownEntities ? JSON.parse(req.query.knownEntities) : {};
 	
 
-	console.log("from session: ", req.params.sessionId);
+	console.log("from session: ", req.params.sessionId, req.query.message, knownEntities);
 	chats[req.params.sessionId].respond(req.query.message, knownEntities, function (response) {
 		res.json(response);
 	});

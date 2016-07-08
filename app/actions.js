@@ -174,7 +174,6 @@ module.exports = function (chat) {
 						chat.addAnswer({
 							type: "rooms",
 							rooms: rooms,
-							action: context.intent,
 							bookButton: false,
 							availButton: false
 						});
@@ -193,7 +192,32 @@ module.exports = function (chat) {
 		},
 
 		selectRoom: function (context, cb) {
-			actions.showRooms(context, cb);
+			RoomAmenities.getRooms(1098, {
+				amenity: context.roomAmenity,
+				type: context.roomType
+			}, function (err, rooms) {
+				// console.log("rooms: ", rooms);
+				rooms = rooms.map(function (room) {
+					var roomTypes = ['single', 'double', 'triple', 'quadruple'];
+
+					return {
+						roomId: room.id,
+						roomTypeName: room.roomTypeName,
+						roomType: roomTypes[ room.maxOccupancy - 1 ],
+						maxOccupancy: room.maxOccupancy
+					};
+				});
+
+				chat.addAnswer({
+					type: "rooms",
+					rooms: rooms,
+					selectable: true,
+					bookButton: false,
+					availButton: false
+				});
+
+				cb(context);
+			});
 		},
 
 		hotelInfo: function (context, cb) {
