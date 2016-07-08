@@ -67,12 +67,17 @@ module.exports = function (chat) {
 			entities.nights = entities.number;
 			entities.guests = entities.number;
 
+			delete context.askDateIn;
+			delete context.askNights;
+			delete context.askRoom;
+
 			if (!context.dateIn) {
 				// if (entities.dates.length == 0) this.addMessage("I expected a date. Could you repeat that?");
 
 				if (entities.dates && entities.dates[0]) context.dateIn = entities.dates[0];
 				if (entities.dates && entities.dates[1]) context.dateOut = entities.dates[1];
 			} else if (!context.dateOut) {
+
 				if (entities.dates && entities.dates.length > 0) {
 					context.dateOut = entities.dates[0];
 				} else if (entities.nights) {
@@ -91,7 +96,10 @@ module.exports = function (chat) {
 					this.addMessage("I expected the number of guests. Could you repeat that?")
 				}*/
 			}
-			console.log("OUT CTX: ", context);
+
+			if (!context.dateIn) context.askDateIn = true;
+			else if (!context.dateOut) context.askNights = true;
+			else if (!context.roomId) context.askRoom = true;
 
 			return context;
 		},

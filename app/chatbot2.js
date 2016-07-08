@@ -108,7 +108,7 @@ ChatBot.prototype.setupActions = function () {
 			self.ai.action('say', self.actions.say);
 
 		} else if (action == 'merge') {
-			self.ai.action('merge', function (text, context, entities, cb) {
+			self.ai.action(action, function (text, context, entities, cb) {
 				console.log("merge: ", text, context, entities, cb);
 
 				if (entities) {

@@ -6,7 +6,7 @@ const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 module.exports = function (chat) {
 	var parsers = new Parsers(chat);
 
-	return {
+	var actions = {
 		say: function (answer) {
 			chat.addMessage(answer);
 		},
@@ -35,8 +35,6 @@ module.exports = function (chat) {
 
 		book: function (context, cb) {
 			console.log("book called", context);
-
-			parsers.book(text, context, entities);
 
 			/*chat.addAnswer({
 				type: 'redirect',
@@ -194,6 +192,10 @@ module.exports = function (chat) {
 			});
 		},
 
+		selectRoom: function (context, cb) {
+			actions.showRooms(context, cb);
+		},
+
 		hotelInfo: function (context, cb) {
 			HotelInfo.getInfo(1098, context.hotelInfo, function (err, value) {
 				var response = { type: "msg" };
@@ -223,4 +225,6 @@ module.exports = function (chat) {
 			chat.emit('respond', chat.popUnsent());
 		}
 	};
+
+	return actions;
 };
