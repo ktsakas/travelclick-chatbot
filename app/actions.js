@@ -114,8 +114,9 @@ module.exports = function (chat) {
 
 					delete context.dateIn;
 					delete context.dateOut;
+					delete context.availability;
 
-					context.availSuccess = true;
+					context.book = true;
 
 					console.log("avail out: ", context);
 
