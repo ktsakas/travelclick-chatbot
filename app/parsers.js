@@ -32,7 +32,7 @@ module.exports = function (chat) {
 				if (entities.guests) {
 					context.guests = entities.guests;
 
-					var roomTypes = ['single', 'double', 'triple'];
+					var roomTypes = ['single', 'double', 'triple', 'quadruple'];
 					context.roomType = roomTypes[ context.guests - 1 ];
 				} else if (entities.roomType) {
 					context.roomType = entities.roomType;
@@ -43,6 +43,8 @@ module.exports = function (chat) {
 						context.guests = 2;
 					} else if (context.roomType == 'triple') {
 						context.guests = 3;
+					} else if (context.roomType == 'quadruple') {
+						context.guests = 4;
 					}
 				}
 				
