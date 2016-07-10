@@ -68,6 +68,8 @@ body {
 		padding: 10px 15px;
 		background-color: white;
 		font-size: 16px;
+		margin: 5px 0px;
+		border-radius: 2px;
 	}
 	
 	// Message arrow style
@@ -80,8 +82,8 @@ body {
 		position: absolute;
 		pointer-events: none;
 		border-color: rgba(0, 0, 0, 0);
-		border-width: 10px;
-		margin-top: -10px;
+		border-width: 8px;
+		margin-top: -9px;
 	}
 
 	.user .message:after {
@@ -92,6 +94,49 @@ body {
 	.bot .message:after {
 		left: 100%;
 		border-left-color: white;
+	}
+
+	/* YES/NO message choice */
+
+	@yes-green: rgba(49, 128, 0, 0.85);
+	@no-red: rgba(255, 0, 0, 0.80);
+
+	.bot .message.yes,
+	.bot .message.no {
+		cursor: pointer;
+		color: white;
+	}
+
+	.bot .message.yes {
+		background-color: @yes-green;
+	}
+
+	.bot .message.no {
+		background-color: @no-red;
+	}
+
+	.bot .message.yes:after {
+		border-left-color: @yes-green;
+	}
+
+	.bot .message.no:after {
+		border-left-color: @no-red;
+	}
+
+	.bot .message.yes:hover {
+		background-color: darken(@yes-green, 20%, relative);
+	}
+
+	.bot .message.no:hover {
+		background-color: darken(@no-red, 20%, relative);
+	}
+
+	.bot .message.yes:hover:after {
+		border-left-color: darken(@yes-green, 20%, relative);
+	}
+
+	.bot .message.no:hover:after {
+		border-left-color: darken(@no-red, 20%, relative);
 	}
 }
 
