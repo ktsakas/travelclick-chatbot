@@ -50,7 +50,7 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 		$scope.addMessage($scope.newMessage);
 	}
 
-	$scope.addMessage = function (newMsg) {
+	$scope.addMessage = function (newMsg, knownEntities) {
 		var equiv = $scope.equiv;
 
 		$scope.answers.push({
@@ -70,13 +70,19 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 
 		// Handle server reponse
 		$http.get("/chat/" + sessionId, {
-			params: { message: newMsg/*, knownEntities: this.knownEntities*/ }
+			params: { message: newMsg, knownEntities: knownEntities }
 		}).then(handleAnswers);
 
 	};
 
-	// Test message
 	/*$scope.answers.push({
+		type: "rooms",
+		rooms: [{"roomId":1534,"roomTypeName":"Herman - Gerlach","roomType":"quadruple","maxOccupancy":4},{"roomId":1535,"roomTypeName":"Ratke LLC","roomType":"quadruple","maxOccupancy":4},{"roomId":1536,"roomTypeName":"Ledner - Schoen","roomType":"quadruple","maxOccupancy":4},{"roomId":1537,"roomTypeName":"Auer LLC","roomType":"quadruple","maxOccupancy":4},{"roomId":1538,"roomTypeName":"Orn - Koss","roomType":"quadruple","maxOccupancy":4}],
+		owner: "bot",
+	});
+	
+	// Test message
+	$scope.answers.push({
 		type: "msg",
 		owner: "user",
 		text: "Test user message",
@@ -95,11 +101,6 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 
 	$scope.answers.push({
 		type: "calendar",
-		owner: "bot",
-	});
-
-	$scope.answers.push({
-		type: "rooms",
 		owner: "bot",
 	});
 

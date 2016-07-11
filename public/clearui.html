@@ -83,25 +83,26 @@
 
 	<!-- Rooms list template -->
 	<script type="text/ng-template" id="rooms.html">
-		<div class="ui fluid card">
+	<div class="rooms" ng-controller="roomsCtrl">
+		<div class="ui fluid card" ng-repeat="room in answer.rooms track by $index">
 			<div class="content">
-				The Kingston Awesome Room
+				{{room.roomTypeName}}
 				<div class="meta">
 				<span class="date">for 3 people</span>
 				</div>
 			</div>
 
 			<img src="http://placehold.it/200x150" />
-
-			<!-- <div class="content">for 3 people</div> -->
+			<!-- <img ng-src="{{room.picture}}" /> -->
 
 			<div class="content">
 				<div class="ui two buttons">
-					<div class="ui basic green button">Details</div>
-					<div class="ui basic blue button">Book</div>
+					<button class="ui basic green button" ng-click="viewDetails()">Details</button>
+					<button class="ui basic blue button" ng-click="bookRoom(room)">Book</button>
 				</div>
 			</div>
 		</div>
+	</div>
 	</script>
 
 
@@ -152,8 +153,11 @@
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk"></script>
 
 	<script src="js/main.js"></script>
+	
 	<script src="js/calendar-ctrl.js"></script>
 	<script src="js/map-ctrl.js"></script>
 	<script src="js/answer-ctrl.js"></script>
+	<script src="js/rooms-ctrl.js"></script>
+
 </body>
 </html>

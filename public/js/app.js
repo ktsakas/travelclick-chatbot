@@ -48,7 +48,7 @@ app.controller("chatCtrl", function ($scope, $element, $http, $timeout) {
 			document.getElementById('new-message').focus();
 
 			var scroller = document.body;
-      		scroller.scrollTop = scroller.scrollHeight;
+			scroller.scrollTop = scroller.scrollHeight;
 		});
 	}
 
@@ -257,8 +257,8 @@ app.controller("msgCtrl", function ($scope, $element, $location) {
 	} else if ($scope.msg.type == 'rooms') {
 		console.log('rooms');
 	} else if ($scope.msg.type == 'directions-steps') {
-		
-		
+
+
 		console.log('directions-steps');
 	} else if ($scope.msg.type == 'prompt') {
 		// Using $parent makes the override visisble on the chat scope
