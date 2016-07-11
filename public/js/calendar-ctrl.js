@@ -1,10 +1,8 @@
 app.controller("calendarCtrl", function ($scope, $element) {
-	console.log($scope);
-
 	var dateIn = null,
 		dateOut = null;
 
-	var startPicker = new Pikaday({
+	var datepicker = new Pikaday({
 		field: $element[0].calendarField,
 		firstDay: 1,
 		minDate: new Date(2000, 0, 1),
@@ -20,9 +18,9 @@ app.controller("calendarCtrl", function ($scope, $element) {
 			if (dateIn && dateOut) {
 				var selectDate = moment(dateIn);
 
-				console.log("day: " + selectDate.get('date') + " -- month: " + selectDate.get('month'));
+				// console.log("day: " + selectDate.get('date') + " -- month: " + selectDate.get('month'));
 				do {
-					console.log(selectDate.get('date'), dateOut.getDate());
+					// console.log(selectDate.get('date'), dateOut.getDate());
 
 					$("button[data-pika-day=" + selectDate.get('date') + "][data-pika-month=" + selectDate.get('month') + "]")
 						.addClass('selected');
@@ -33,22 +31,25 @@ app.controller("calendarCtrl", function ($scope, $element) {
 		onSelect: function () {
 			if (!dateIn) {
 				dateOut = dateIn = this.getDate();
-				startPicker.setMinDate(dateIn);
+				datepicker.setMinDate(dateIn);
 			} else {
 				dateOut = this.getDate();
 			}
 		}
 	});
 
-	startPicker.setMinDate(new Date());
-});
+	$scope.clearCalendar = function () {
+		console.log("clearing calendar");
 
-/*var endPicker = new Pikaday({
-	field: document.getElementById('endDate'),
-	firstDay: 1,
-	minDate: new Date(2000, 0, 1),
-	maxDate: new Date(2020, 12, 31),
-	yearRange: [2000, 2020],
-	bound: false,
-	container: document.getElementById('container'),
-});*/
+		dateIn = null;
+		dateOut = null;
+
+		$("button").removeClass("selected");
+	};
+
+	$scope.selectDate = function () {
+		$scope.addMessage("from January 1st to January 15th");
+	};
+
+	datepicker.setMinDate(new Date());
+});

@@ -68,8 +68,8 @@ WitAPI.prototype.query = function (text) {
 				self.query();
 			});
 		} else if (body.type == "msg") {
-		 	console.log("SAYING", body.msg);
-			self.callAction('say', body.msg);
+		 	console.log("SAYING", body);
+			self.callAction('say', body);
 			self.query();
 		} else if (body.type == "action") {
 			self.callAction(body.action, self.context, function (newCtx) {

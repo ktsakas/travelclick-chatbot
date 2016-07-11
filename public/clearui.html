@@ -41,7 +41,7 @@
 				<ng-include ng-if="answer.type == 'rooms'" src="'rooms.html'"></ng-include>
 				
 				<ng-include
-					ng-if="answer.type == 'availability'" src="'calendar.html'">
+					ng-if="answer.type == 'availability' || answer.type == 'calendar'" src="'calendar.html'">
 				</ng-include>
 				
 				<ng-include 
@@ -75,16 +75,18 @@
 	<!-- Yes/No answer template -->
 	<script type="text/ng-template" id="yes_no.html">
 	<form ng-controller="yesNoCtrl" class="temporary">
-		<button name="yes" ng-click="addMessage('Yes')" class="ui msg green right pointing label">Yes</button><br />
-		<button name="no" ng-click="addMessage('No')" class="ui msg red right pointing label">No</button>
+		<button ng-click="addMessage('Yes')" class="ui msg green right pointing label">Yes</button><br />
+		<button ng-click="addMessage('No')" class="ui msg red right pointing label">No</button>
 	</form>
 	</script>
 
 
 	<!-- Rooms list template -->
 	<script type="text/ng-template" id="rooms.html">
-	<div class="rooms" ng-controller="roomsCtrl">
-		<div class="ui fluid card" ng-repeat="room in answer.rooms track by $index">
+	<div class="rooms temporary" ng-controller="roomsCtrl">
+		<div class="ui fluid card {{answer.selectable ? 'selectable' : ''}}"
+			 ng-repeat="room in answer.rooms track by $index"
+			 ng-click="addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
 			<div class="content">
 				{{room.roomTypeName}}
 				<div class="meta">
@@ -98,9 +100,9 @@
 			<div class="content">
 				<div class="ui two buttons">
 					<button class="ui basic green button" ng-click="viewDetails()">Details</button>
-					<button ng-if="rooms.availButton" class="ui basic blue button" ng-click="bookRoom(room)">Book</button>
-					<button
-						class="ui basic blue button" ng-click="addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+					<button ng-if="answer.bookButton" class="ui basic blue button" ng-click="bookRoom(room)">Book</button>
+					<button ng-if="answer.availButton" class="ui basic blue button"
+							ng-click="addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
 						Availability
 					</button>
 					<!--  ng-if="rooms.bookButton" -->
@@ -113,16 +115,18 @@
 
 	<!-- Calendar template -->
 	<script type="text/ng-template" id="calendar.html">
-	<form name="calendar" ng-controller="calendarCtrl">
+	<form name="calendar" ng-controller="calendarCtrl" class="{{answer.type == 'calendar' ? 'temporary' : ''}}">
 		<input type="text" name="calendarField" style="display: none;" />
 
 		<div class="container">
 			<div class="calendar"></div>
 
-			<div class="rangetip">from January 10th to January 15th</div>
+			<span ng-if="answer.type != 'availability'">
+				<div class="rangetip">from January 10th to January 15th</div>
 
-			<input type="button" name="clear" class="ui negative basic button" value="Clear" />
-			<input type="button" name="done" class="ui primary button" value="Done" />
+				<input type="button" ng-click="clearCalendar()" class="ui negative basic button" value="Clear" />
+				<input type="button" ng-click="selectDate()" class="ui primary button" value="Done" />
+			</span>
 		</div>
 
 		<div class="avail-color">&nbsp;</div> Available

@@ -16,8 +16,10 @@ module.exports = function (chat) {
 	}*/
 
 	var actions = {
-		say: function (answer) {
-			chat.addMessage(answer);
+		say: function (entities) {
+			chat.addMessage(entities.msg);
+
+			if (entities.quickreplies) chat.addAnswer({ type: 'yes_no' });
 		},
 
 		merge: function (text, context, entities, cb) {
@@ -220,6 +222,14 @@ module.exports = function (chat) {
 
 				cb(context);
 			});
+		},
+
+		selectDates: function (context, cb) {
+			chat.addAnswer({
+				type: "calendar",
+			});
+
+			cb(context);
 		},
 
 		hotelInfo: function (context, cb) {

@@ -5,6 +5,7 @@
 body {
 	font-family: 'Lato', sans-serif;
 	background-color: #EEE;
+	overflow: scroll;
 }
 
 .center {
@@ -91,6 +92,14 @@ body {
 			width: auto;
 			float: right;
 			margin: 10px;
+		}
+
+		.card.selectable {
+			cursor: pointer;
+		}
+
+		.card.selectable:hover {
+			background-color: rgba(0, 78, 255, 0.5);
 		}
 	}
 }
