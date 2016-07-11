@@ -64,13 +64,13 @@
 			</li>
 
 			<li class="bot">
-				<div>Select start date:</div>
-
 				<!-- Start Date -->
 				<input type="text" id="startDate" style="display: none;" />
 
 				<div class="container">
 					<div class="calendar"></div>
+
+					<div class="rangetip">from January 10th to January 15th</div>
 
 					<input type="button" class="ui negative basic button" value="Clear" />
 					<input type="button" class="ui primary button" value="Done" />
@@ -126,20 +126,6 @@
 
 				} while (!selectDate.isSame(dateOut) && selectDate.add(1, 'days'));
 			}
-			/*if (dateIn) {
-				var dayIn = dateIn.getDate(),
-					monthIn = dateIn.getMonth();
-				console.log("day in: " + dayIn + " month in: " + monthIn);
-
-				$("button[data-pika-day=" + dayIn + "][data-pika-month=" + monthIn + "]").addClass('selected');
-			}
-
-			if (dateOut) {
-				var dayOut = dateOut.getDate(),
-					monthOut = dateOut.getMonth();
-
-				$("button[data-pika-day=" + dayOut + "][data-pika-month=" + monthOut + "]").addClass('selected');
-			}*/
 		},
 		onSelect: function () {
 			if (!dateIn) {

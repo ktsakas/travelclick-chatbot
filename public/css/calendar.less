@@ -1,9 +1,27 @@
 @avail-green: rgba(89, 206, 0, 0.5);
 @booked-red: rgba(255, 0, 0, 0.5);
 
+.container {
+	background-color: white;
+	padding: 5px;
+	padding-bottom: 10px;
+	margin-bottom: 5px;
+	border-radius: 3px;
+}
+
+.rangetip {
+	opacity: 0.6;
+	margin: 5px;
+}
+
 .pika-lendar {
 	font-family: 'Lato', sans-serif;
 	font-size: 24px;
+	margin: 0px;
+}
+
+.pika-single {
+	z-index: 0;
 }
 
 .pika-button.pika-day.selected {
@@ -51,13 +69,9 @@ td:not(.is-disabled) .pika-button.pika-day.booked {
 	background-color: @booked-red;
 	width: 18px;
 	border-radius: 1000px;
+	margin-left: 10px;
 }
 
 .pika-single {
 	border: none;
-}
-
-.container {
-	background-color: white;
-
 }

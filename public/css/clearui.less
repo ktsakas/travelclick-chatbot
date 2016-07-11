@@ -34,9 +34,14 @@ body {
 
 #chat {
 	padding: 0px 10px;
+	overflow-x: visible;
 	overflow-y: hidden;
 	list-style: none;
 	margin-bottom: 100px;
+
+	.faded {
+		opacity: 0.5;
+	}
 
 	.user {
 		@keyframes user-msg-enter {
@@ -58,6 +63,7 @@ body {
 		float: right;
 		clear: both;
 		animation: bot-msg-enter 1s;
+		text-align: right;
 	}
 
 	.msg {
@@ -88,8 +94,9 @@ body {
 
 #footer {
 	position: fixed;
+	background-color: rgba(238, 238, 238, 0.6);
 	bottom: 0px;
-	margin-bottom: 20px;
+	padding-bottom: 20px;
 	width: 100%;
 	max-width: inherit;
 
