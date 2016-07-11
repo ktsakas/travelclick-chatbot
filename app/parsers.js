@@ -118,6 +118,10 @@ module.exports = function (chat) {
 				context.fromLocation = entities.location;
 			}
 
+			if (!context.fromLocation) {
+				context.askFromLocation = true;
+			}
+
 			return context;
 		},
 

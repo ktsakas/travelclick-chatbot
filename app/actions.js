@@ -72,24 +72,19 @@ module.exports = function (chat) {
 		},
 
 		directions: function (context, cb) {
-			if (!context.fromLocation) {
-				context.askFromLocation = true;
+			console.log("CALLING DIRECTIONS!\n");
+			context.askHelp = true;
 
-				cb(context);
-			} else {
-				context.success = true;
+			chat.addAnswer({
+				type: 'directions',
+				origin: "JFK Airport",
+				dest: {
+					lat: 37.8386741,
+					lng: -122.2936934
+				}
+			});
 
-				chat.addAnswer({
-					type: 'directions',
-					origin: "JFK Airport",
-					dest: {
-						lat: 37.8386741,
-						lng: -122.2936934
-					}
-				});
-
-				cb(context);
-			}
+			cb(context);
 		},
 
 		availability: function (context, cb) {	
