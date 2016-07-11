@@ -58,6 +58,13 @@ app.controller("calendarCtrl", function ($scope, $element) {
 				} else {
 					dateOut = this.getDate();
 				}
+
+				if (dateIn && dateOut) {
+					var datestipElm = $element[0].getElementsByClassName('rangetip')[0];
+
+					datestipElm.innerHTML = "from " + moment(dateIn).format("MMMM Do") +
+						" to " +moment(dateOut).format("MMMM Do");
+				}
 			}
 		});
 
@@ -75,7 +82,8 @@ app.controller("calendarCtrl", function ($scope, $element) {
 	};
 
 	$scope.selectDate = function () {
-		$scope.addMessage("from January 1st to January 15th");
+		var datestipElm = $element[0].getElementsByClassName('rangetip')[0];
+		$scope.addMessage(datestipElm.innerHTML);
 	};
 
 	$scope.init();

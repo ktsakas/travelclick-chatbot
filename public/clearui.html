@@ -86,7 +86,7 @@
 	<div class="rooms temporary" ng-controller="roomsCtrl">
 		<div class="ui fluid card {{answer.selectable ? 'selectable' : ''}}"
 			 ng-repeat="room in answer.rooms track by $index"
-			 ng-click="addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+			 ng-click="answer.selectable && addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
 			<div class="content">
 				{{room.roomTypeName}}
 				<div class="meta">
@@ -125,7 +125,7 @@
 			<div class="calendar"></div>
 
 			<span ng-if="answer.type != 'availability'">
-				<div class="rangetip">from January 10th to January 15th</div>
+				<div class="rangetip">from to</div>
 
 				<input type="button" ng-click="clearCalendar()" class="ui negative basic button" value="Clear" />
 				<input type="button" ng-click="selectDate()" class="ui primary button" value="Done" />
