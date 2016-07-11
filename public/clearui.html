@@ -83,7 +83,7 @@
 
 	<!-- Rooms list template -->
 	<script type="text/ng-template" id="rooms.html">
-	<div class="rooms temporary" ng-controller="roomsCtrl">
+	<div class="rooms" ng-controller="roomsCtrl">
 		<div class="ui fluid card {{answer.selectable ? 'selectable' : ''}}"
 			 ng-repeat="room in answer.rooms track by $index"
 			 ng-click="answer.selectable && addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">

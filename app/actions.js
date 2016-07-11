@@ -37,9 +37,9 @@ module.exports = function (chat) {
 				context = parsers.directions(text, context, entities);
 			} else if (context.hotelInfo) {
 				context = parsers.hotelInfo(text, context, entities);
-			} /*else if (context.roomInfo) {
-				// Do nothing
-			}*/ else {
+			} else if (context.roomInfo) {
+				context = parsers.roomInfo(text, context, entities);
+			} else {
 				context.unknown = true;
 			}
 
@@ -137,6 +137,7 @@ module.exports = function (chat) {
 				// console.log("rooms: ", rooms);
 
 				if (rooms.length >= 0) {
+					console.log("Have many rooms: ", context);
 					if (context.roomAmenity && context.roomType) {
 						chat.addMessage(
 							"Here are all our " + context.roomType + " with " + context.roomAmenity
@@ -187,6 +188,8 @@ module.exports = function (chat) {
 						"Unfortunately, we don't have any " + roomType + amenitySuffix + "."
 					);
 				}
+
+				context.askHelp = true;
 
 				cb(context);
 			});
