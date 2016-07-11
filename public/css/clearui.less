@@ -39,14 +39,10 @@ body {
 	list-style: none;
 	margin-bottom: 100px;
 
-	.faded {
-		opacity: 0.5;
-	}
-
 	.user {
 		@keyframes user-msg-enter {
 			from { margin-left: -100px; opacity: 0; }
-			to { margin-left: 0px; opacity: 1; }
+			to { opacity: 1; }
 		}
 
 		float: left;
@@ -57,13 +53,12 @@ body {
 	.bot {
 		@keyframes bot-msg-enter {
 			from { margin-right: -100px; opacity: 0; }
-			to { margin-right: 0px; opacity: 1; }
+			to { opacity: 1; }
 		}
 
 		float: right;
 		clear: both;
 		animation: bot-msg-enter 1s;
-		text-align: right;
 	}
 
 	.msg {
