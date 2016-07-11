@@ -100,7 +100,10 @@
 			<div class="content">
 				<div class="ui two buttons">
 					<button class="ui basic green button" ng-click="viewDetails()">Details</button>
-					<button ng-if="answer.bookButton" class="ui basic blue button" ng-click="bookRoom(room)">Book</button>
+					<button ng-if="answer.bookButton" class="ui basic blue button"
+							ng-click="bookRoom($event, room);">
+						Book
+					</button>
 					<button ng-if="answer.availButton" class="ui basic blue button"
 							ng-click="addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
 						Availability

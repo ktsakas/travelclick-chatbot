@@ -37,7 +37,9 @@ module.exports = function (chat) {
 				context = parsers.directions(text, context, entities);
 			} else if (context.hotelInfo) {
 				context = parsers.hotelInfo(text, context, entities);
-			} else {
+			} /*else if (context.roomInfo) {
+				// Do nothing
+			}*/ else {
 				context.unknown = true;
 			}
 
@@ -167,7 +169,7 @@ module.exports = function (chat) {
 							type: "rooms",
 							rooms: rooms,
 							bookButton: true,
-							availButton: true
+							availButton: false
 						});
 					} else {
 						chat.addAnswer({
