@@ -24,34 +24,57 @@
 	<div class="center">
 		<ul id="chat">
 			<li class="user">
-				<div class="message">Wanna book a room?</div>
+				<div class="ui msg left pointing label">Wanna book a room?</div>
 			</li>
 			<li class="bot">
-				<div class="message">Sure that sounds good.</div>				
+				<div class="ui msg right pointing label">Sure that sounds good.</div>				
 			</li>
+
 			<li class="bot">
 			<!-- 
-				<div class="ui message yes">Yes</div>
-				<div class="ui message no">No</div>
+				<div class="ui msg yes">Yes</div>
+				<div class="ui msg no">No</div>
 			 -->
-				<div class="ui message green button right pointing label">Yes</div>
-				<div class="ui message red button right pointing label">No</div>
+				<button class="ui msg green right pointing label">Yes</button>
+				<button class="ui msg red right pointing label">No</button>
 			</li>
+
+			<li class="bot">
+
+				<div class="ui fluid card">
+					<div class="content">
+						The Kingston Awesome Room
+						<div class="meta">
+						<span class="date">for 3 people</span>
+						</div>
+					</div>
+
+					<img src="http://placehold.it/200x150" />
+
+					<!-- <div class="content">for 3 people</div> -->
+
+					<div class="content">
+						<div class="ui two buttons">
+							<div class="ui basic green button">Details</div>
+							<div class="ui basic blue button">Book</div>
+						</div>
+					</div>
+				</div>
+
+			</li>
+
 			<li class="bot">
 				<div>Select start date:</div>
 
 				<!-- Start Date -->
-            	<input type="text" id="startDate" style="display: none;" />
+				<input type="text" id="startDate" style="display: none;" />
 
-            	<div class="container">
+				<div class="container">
 					<div class="calendar"></div>
 
 					<input type="button" class="ui negative basic button" value="Clear" />
 					<input type="button" class="ui primary button" value="Done" />
 				</div>
-				
-
-				<br />
 
 				<div class="avail-color">&nbsp;</div> Available
 				<div class="booked-color">&nbsp;</div> Booked
@@ -85,7 +108,7 @@
 		maxDate: new Date(2020, 12, 31),
 		yearRange: [2000, 2020],
 		bound: false,
-		container: document.getElementById('calendar'),
+		container: document.getElementsByClassName('calendar')[0],
 		onDraw: function () {
 			$("button[data-pika-day=14]").addClass('avail');
 			$("button[data-pika-day=15]").addClass('booked');
