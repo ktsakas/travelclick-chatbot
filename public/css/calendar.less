@@ -1,0 +1,73 @@
+@avail-green: rgba(89, 206, 0, 0.5);
+@booked-red: rgba(255, 0, 0, 0.5);
+
+
+.pika-lendar {
+	font-family: 'Lato', sans-serif;
+}
+
+.pika-button.pika-day.selected {
+	// background-color: #DDD;
+	background-color: rgba(0, 78, 255, 0.73) !important;
+	box-shadow: none;
+	border-radius: 0px;
+}
+
+.selected:first-of-type {
+	border-top-left-radius: 1000px;
+	border-bottom-left-radius: 1000px;
+}
+
+/*td:last-child .pika-button.pika-day.selected {
+	border-top-right-radius: 1000px;
+	border-bottom-right-radius: 1000px;
+}*/
+
+/*.pika-button.pika-day.selected:last-child {
+	border-top-right-radius: 1000px;
+	border-bottom-right-radius: 1000px;
+}*/
+
+.pika-button.pika-day {
+	background-color: transparent;
+	color: black;
+	text-align: center;
+	padding: 10px;
+	outline: none;
+}
+
+td:not(.is-disabled) .pika-button.pika-day.avail {
+	background-color: @avail-green;
+}
+
+td:not(.is-disabled) .pika-button.pika-day.booked {
+	background-color: @booked-red;
+}
+
+
+.pika-button.pika-day:hover {
+	background-color: #EEE;
+}
+
+.avail-color {
+	display: inline-block;
+	background-color: @avail-green;
+	width: 18px;
+	border-radius: 1000px;
+}
+
+.booked-color {
+	display: inline-block;
+	background-color: @booked-red;
+	width: 18px;
+	border-radius: 1000px;
+}
+
+.pika-single {
+	border: none;
+}
+
+.container {
+	background-color: white;
+	
+}

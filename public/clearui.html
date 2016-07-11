@@ -6,8 +6,10 @@
 	<link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic' rel='stylesheet' type='text/css'>
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.css" rel="stylesheet" type="text/css" />
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/css/pikaday.min.css" rel="stylesheet" type="text/css" />
 	
 	<link rel="stylesheet/less" type="text/css" href="css/clearui.less" />
+	<link rel="stylesheet/less" type="text/css" href="css/calendar.less" />
 </head>
 <body>
 
@@ -28,11 +30,31 @@
 				<div class="message">Sure that sounds good.</div>				
 			</li>
 			<li class="bot">
-				<div class="message yes">Yes</div>
-				<div class="message no">No</div>
+			<!-- 
+				<div class="ui message yes">Yes</div>
+				<div class="ui message no">No</div>
+			 -->
+				<div class="ui message green button right pointing label">Yes</div>
+				<div class="ui message red button right pointing label">No</div>
 			</li>
 			<li class="bot">
+				<div>Select start date:</div>
+
+				<!-- Start Date -->
+            	<input type="text" id="startDate" style="display: none;" />
+
+            	<div class="container">
+					<div class="calendar"></div>
+
+					<input type="button" class="ui negative basic button" value="Clear" />
+					<input type="button" class="ui primary button" value="Done" />
+				</div>
 				
+
+				<br />
+
+				<div class="avail-color">&nbsp;</div> Available
+				<div class="booked-color">&nbsp;</div> Booked
 			</li>
 		</ul>
 
@@ -49,6 +71,79 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/pikaday.min.js"></script>
 
+	<script>
+	var dateIn = null,
+		dateOut = null;
+
+	var startPicker = new Pikaday({
+		field: document.getElementById('startDate'),
+		firstDay: 1,
+		minDate: new Date(2000, 0, 1),
+		maxDate: new Date(2020, 12, 31),
+		yearRange: [2000, 2020],
+		bound: false,
+		container: document.getElementById('calendar'),
+		onDraw: function () {
+			$("button[data-pika-day=14]").addClass('avail');
+			$("button[data-pika-day=15]").addClass('booked');
+
+
+			if (dateIn && dateOut) {
+				var selectDate = moment(dateIn);
+
+				console.log("day: " + selectDate.get('date') + " -- month: " + selectDate.get('month'));
+				do {
+					console.log(selectDate.get('date'), dateOut.getDate());
+
+					$("button[data-pika-day=" + selectDate.get('date') + "][data-pika-month=" + selectDate.get('month') + "]")
+						.addClass('selected');
+
+				} while (!selectDate.isSame(dateOut) && selectDate.add(1, 'days'));
+			}
+			/*if (dateIn) {
+				var dayIn = dateIn.getDate(),
+					monthIn = dateIn.getMonth();
+				console.log("day in: " + dayIn + " month in: " + monthIn);
+
+				$("button[data-pika-day=" + dayIn + "][data-pika-month=" + monthIn + "]").addClass('selected');
+			}
+
+			if (dateOut) {
+				var dayOut = dateOut.getDate(),
+					monthOut = dateOut.getMonth();
+
+				$("button[data-pika-day=" + dayOut + "][data-pika-month=" + monthOut + "]").addClass('selected');
+			}*/
+		},
+		onSelect: function () {
+			if (!dateIn) {
+				dateOut = dateIn = this.getDate();
+				startPicker.setMinDate(dateIn);
+			} else {
+				dateOut = this.getDate();
+			}
+		}
+	});
+
+	console.log( $("button[data-pick-year=2016]") );
+
+	/*var endPicker = new Pikaday({
+		field: document.getElementById('endDate'),
+		firstDay: 1,
+		minDate: new Date(2000, 0, 1),
+		maxDate: new Date(2020, 12, 31),
+		yearRange: [2000, 2020],
+		bound: false,
+		container: document.getElementById('container'),
+	});*/
+	startPicker.setMinDate(new Date());
+
+	/*startPicker.setStartRange(startDate);
+	endPicker.setStartRange(startDate);
+	endPicker.setMinDate(startDate);*/
+	</script>
 </body>
 </html>
