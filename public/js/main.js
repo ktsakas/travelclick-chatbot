@@ -105,7 +105,7 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 	});
 
 	$scope.answers.push({
-		type: "calendar",
+		type: "availabitlity",
 		owner: "bot",
 	});
 

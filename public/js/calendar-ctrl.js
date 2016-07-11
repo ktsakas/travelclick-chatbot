@@ -1,5 +1,5 @@
 app.controller("calendarCtrl", function ($scope, $element) {
-	console.log("calendar controller");
+	console.log($scope);
 
 	var dateIn = null,
 		dateOut = null;
