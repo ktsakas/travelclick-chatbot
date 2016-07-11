@@ -10,84 +10,134 @@
 	
 	<link rel="stylesheet/less" type="text/css" href="css/clearui.less" />
 	<link rel="stylesheet/less" type="text/css" href="css/calendar.less" />
+	<link rel="stylesheet/less" type="text/css" href="css/map-directions.less" />
 </head>
-<body>
-
+<body ng-app="chatbot" ng-controller="chatCtrl">
+	
+	<!-- Topbar -->
 	<div id="topbar">
 		<div class="center">
 			TravelClick ChatBot Assistant
 
 			<a href="https://github.com/ktsakas/travelclick-chatbot"><i class="github icon"></i></a>
 		</div>
-	</div>
+	</div>	
+
 
 	<div class="center">
+		<!-- List of chat messages -->
 		<ul id="chat">
-			<li class="user">
-				<div class="ui msg left pointing label">Wanna book a room?</div>
-			</li>
-			<li class="bot">
-				<div class="ui msg right pointing label">Sure that sounds good.</div>				
-			</li>
+			<li class="user" ng-controller="answerCtrl" ng-repeat="answer in answers">
 
-			<li class="bot">
-			<!-- 
-				<div class="ui msg yes">Yes</div>
-				<div class="ui msg no">No</div>
-			 -->
-				<button class="ui msg green right pointing label">Yes</button>
-				<button class="ui msg red right pointing label">No</button>
-			</li>
+				<ng-include
+					ng-if="answer.type == 'msg'" src="'msg.html'" ng-controller="msgCtrl">
+				</ng-include>
 
-			<li class="bot">
-
-				<div class="ui fluid card">
-					<div class="content">
-						The Kingston Awesome Room
-						<div class="meta">
-						<span class="date">for 3 people</span>
-						</div>
-					</div>
-
-					<img src="http://placehold.it/200x150" />
-
-					<!-- <div class="content">for 3 people</div> -->
-
-					<div class="content">
-						<div class="ui two buttons">
-							<div class="ui basic green button">Details</div>
-							<div class="ui basic blue button">Book</div>
-						</div>
-					</div>
-				</div>
-
-			</li>
-
-			<li class="bot">
-				<!-- Start Date -->
-				<input type="text" id="startDate" style="display: none;" />
-
-				<div class="container">
-					<div class="calendar"></div>
-
-					<div class="rangetip">from January 10th to January 15th</div>
-
-					<input type="button" class="ui negative basic button" value="Clear" />
-					<input type="button" class="ui primary button" value="Done" />
-				</div>
-
-				<div class="avail-color">&nbsp;</div> Available
-				<div class="booked-color">&nbsp;</div> Booked
+				<!-- Bot only answers -->
+				<ng-include
+					ng-if="answer.type == 'yes_no'" src="'yes_no.html'">
+				</ng-include>
+				
+				<ng-include ng-if="answer.type == 'rooms'" src="'rooms.html'"></ng-include>
+				
+				<ng-include
+					ng-if="answer.type == 'calendar'" src="'calendar.html'">
+				</ng-include>
+				
+				<ng-include 
+					ng-if="answer.type == 'map_directions'" src="'map_directions.html'">
+				</ng-include>
 			</li>
 		</ul>
-
+		
+		<!-- Input to send message -->
 		<div id="footer">
-			<div class="ui action input">
-				<input type="text" placeholder="Send a message..." />
+			<form class="ui action input" ng-submit="addMessage(this)">
+				<input type="text" placeholder="Send a message..." ng-model="newMessage" />
 				<button class="ui icon button"><i class="send icon"></i></button>
+			</form>
+		</div>
+	</div>
+
+
+
+	<!-- Message template -->
+	<script type="text/ng-template" id="msg.html">
+		<div class="ui msg {{answer.owner == 'user' ? 'left' : 'right'}} pointing label">
+			{{answer.text}}
+		</div>
+	</script>
+
+
+	<!-- Yes/No answer template -->
+	<script type="text/ng-template" id="yes_no.html">
+	<form ng-controller="yesNoCtrl">
+		<button name="yes" class="ui msg green right pointing label">Yes</button>
+		<button name="no" class="ui msg red right pointing label">No</button>
+	</form>
+	</script>
+
+
+	<!-- Rooms list template -->
+	<script type="text/ng-template" id="rooms.html">
+		<div class="ui fluid card">
+			<div class="content">
+				The Kingston Awesome Room
+				<div class="meta">
+				<span class="date">for 3 people</span>
+				</div>
+			</div>
+
+			<img src="http://placehold.it/200x150" />
+
+			<!-- <div class="content">for 3 people</div> -->
+
+			<div class="content">
+				<div class="ui two buttons">
+					<div class="ui basic green button">Details</div>
+					<div class="ui basic blue button">Book</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+
+	<!-- Calendar template -->
+	<script type="text/ng-template" id="calendar.html">
+	<form name="calendar" ng-controller="calendarCtrl">
+		<input type="text" name="calendarField" style="display: none;" />
+
+		<div class="container">
+			<div class="calendar"></div>
+
+			<div class="rangetip">from January 10th to January 15th</div>
+
+			<input type="button" name="clear" class="ui negative basic button" value="Clear" />
+			<input type="button" name="done" class="ui primary button" value="Done" />
+		</div>
+
+		<div class="avail-color">&nbsp;</div> Available
+		<div class="booked-color">&nbsp;</div> Booked
+	</form>
+	</script>
+
+
+	<!-- Map/Directions template -->
+	<script type="text/ng-template" id="map_directions.html">
+	<div ng-controller="mapDirectionsCtrl">
+		<div class="map"></div>
+
+		<div class="diretions">
+			<div ng-repeat="step in directions">
+				<span style="position: relative; margin-right: 19px;">
+					<i class="adp-maneuver adp-{{step.maneuver}}"></i>
+				</span>
+				<span ng-bind-html="step.instructions | unsafe"></span>
 			</div>
 		</div>
 	</div>
+	</script>
+
 
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
@@ -96,63 +146,11 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/pikaday.min.js"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk"></script>
 
-	<script>
-	var dateIn = null,
-		dateOut = null;
-
-	var startPicker = new Pikaday({
-		field: document.getElementById('startDate'),
-		firstDay: 1,
-		minDate: new Date(2000, 0, 1),
-		maxDate: new Date(2020, 12, 31),
-		yearRange: [2000, 2020],
-		bound: false,
-		container: document.getElementsByClassName('calendar')[0],
-		onDraw: function () {
-			$("button[data-pika-day=14]").addClass('avail');
-			$("button[data-pika-day=15]").addClass('booked');
-
-
-			if (dateIn && dateOut) {
-				var selectDate = moment(dateIn);
-
-				console.log("day: " + selectDate.get('date') + " -- month: " + selectDate.get('month'));
-				do {
-					console.log(selectDate.get('date'), dateOut.getDate());
-
-					$("button[data-pika-day=" + selectDate.get('date') + "][data-pika-month=" + selectDate.get('month') + "]")
-						.addClass('selected');
-
-				} while (!selectDate.isSame(dateOut) && selectDate.add(1, 'days'));
-			}
-		},
-		onSelect: function () {
-			if (!dateIn) {
-				dateOut = dateIn = this.getDate();
-				startPicker.setMinDate(dateIn);
-			} else {
-				dateOut = this.getDate();
-			}
-		}
-	});
-
-	console.log( $("button[data-pick-year=2016]") );
-
-	/*var endPicker = new Pikaday({
-		field: document.getElementById('endDate'),
-		firstDay: 1,
-		minDate: new Date(2000, 0, 1),
-		maxDate: new Date(2020, 12, 31),
-		yearRange: [2000, 2020],
-		bound: false,
-		container: document.getElementById('container'),
-	});*/
-	startPicker.setMinDate(new Date());
-
-	/*startPicker.setStartRange(startDate);
-	endPicker.setStartRange(startDate);
-	endPicker.setMinDate(startDate);*/
-	</script>
+	<script src="js/main.js"></script>
+	<script src="js/calendar-ctrl.js"></script>
+	<script src="js/map-ctrl.js"></script>
+	<script src="js/answer-ctrl.js"></script>
 </body>
 </html>
