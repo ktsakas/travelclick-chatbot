@@ -27,7 +27,7 @@
 	<div class="center">
 		<!-- List of chat messages -->
 		<ul id="chat">
-			<li class="user" ng-controller="answerCtrl" ng-repeat="answer in answers">
+			<li class="{{answer.owner}}" ng-controller="answerCtrl" ng-repeat="answer in answers">
 
 				<ng-include
 					ng-if="answer.type == 'msg'" src="'msg.html'" ng-controller="msgCtrl">
@@ -48,11 +48,14 @@
 					ng-if="answer.type == 'map_directions'" src="'map_directions.html'">
 				</ng-include>
 			</li>
+
+			<!-- Fit height fix -->
+			<li style="clear: both;"></li>
 		</ul>
 		
 		<!-- Input to send message -->
 		<div id="footer">
-			<form class="ui action input" ng-submit="addMessage(this)">
+			<form class="ui action input" ng-submit="submitMessage(this)">
 				<input type="text" placeholder="Send a message..." ng-model="newMessage" />
 				<button class="ui icon button"><i class="send icon"></i></button>
 			</form>
@@ -71,9 +74,9 @@
 
 	<!-- Yes/No answer template -->
 	<script type="text/ng-template" id="yes_no.html">
-	<form ng-controller="yesNoCtrl">
-		<button name="yes" class="ui msg green right pointing label">Yes</button>
-		<button name="no" class="ui msg red right pointing label">No</button>
+	<form ng-controller="yesNoCtrl" class="temporary">
+		<button name="yes" ng-click="addMessage('Yes')" class="ui msg green right pointing label">Yes</button><br />
+		<button name="no" ng-click="addMessage('No')" class="ui msg red right pointing label">No</button>
 	</form>
 	</script>
 
