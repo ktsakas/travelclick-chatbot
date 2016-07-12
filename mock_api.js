@@ -120,6 +120,11 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 	var result = {
 		hotelCode: req.params.hotelCode,
 		hotelName: faker.company.companyName(),
+		mainImage: {
+			sortOrder: 0,
+			source: "http://lorempixel.com/1366/768/city/1/",
+			type: "image"
+		},
 
 		guestRooms: []
 	};
@@ -148,7 +153,7 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 				isPremiumAmenity: true,
 				image: {
 					type: "photo",
-					source: "http://lorempixel.com/200/200/city/1/",
+					source: "http://lorempixel.com/200/150/city/1/",
 					sortOrder: 0
 				},
 				sortOrder: 0
@@ -164,7 +169,7 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 				isPremiumAmenity: true,
 				image: {
 					type: "photo",
-					source: "http://lorempixel.com/200/200/city/1/",
+					source: "http://lorempixel.com/200/150/city/1/",
 					sortOrder: 0
 				},
 				sortOrder: 0
