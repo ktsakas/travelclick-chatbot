@@ -51,7 +51,7 @@ ChatBot.prototype.addMessage = function (message) {
 
 ChatBot.prototype.normalize = function (entities) {
 	var firstValEntities = [
-		'intent', 'yes_no', 'nights', 'guests', 'roomType', 'location', 'hotelInfo', 'number', 'roomAmenity'
+		'intent', 'textCommand', 'yes_no', 'nights', 'guests', 'roomType', 'location', 'hotelInfo', 'number', 'roomAmenity'
 	];
 
 	/*

@@ -1,8 +1,18 @@
-const request = require('request');
+const request = require('request-promise');
 const _ = require('underscore');
 
 var RoomAmenities = {
 	port: process.env.PORT || 3000,
+
+	promiseGetRoom: function (hotelCode, roomId) {
+		return request.get({
+			url : "http://localhost:" + this.port + "/hotel/" + hotelCode + "/info/rooms",
+			json: true
+		}).then(function (body) {
+			// Filter rooms by id
+			return _(body.guestRooms).filter((room) => room.id == roomId);
+		});
+	},
 
 	getRoom: function (hotelCode, roomId, cb) {
 		request.get({
@@ -71,6 +81,10 @@ var RoomAmenities = {
 		});
 	}	
 };
+
+/*RoomAmenities.promiseGetRoom(1098, 1535).then(function (rooms) {
+	console.log(rooms);
+});*/
 
 module.exports = RoomAmenities;
 

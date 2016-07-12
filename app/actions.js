@@ -23,7 +23,7 @@ module.exports = function (chat) {
 		},
 
 		merge: function (text, context, entities, cb) {
-			console.log('merging: ', entities, context);
+			console.log('merging: ', text, entities, context);
 
 			if (entities.intent) {
 				context[entities.intent] = true;
@@ -39,6 +39,9 @@ module.exports = function (chat) {
 				context = parsers.hotelInfo(text, context, entities);
 			} else if (context.roomInfo) {
 				context = parsers.roomInfo(text, context, entities);
+			} else if (context.text) {
+				console.log("PARSING TEXT");
+				context = parsers.text(text, context, entities);
 			} else {
 				context.unknown = true;
 			}
