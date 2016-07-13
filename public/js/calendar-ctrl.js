@@ -83,7 +83,7 @@ app.controller("calendarCtrl", function ($scope, $element) {
 
 	$scope.selectDate = function () {
 		var datestipElm = $element[0].getElementsByClassName('rangetip')[0];
-		$scope.addMessage(datestipElm.innerHTML);
+		$scope.sendMessage(datestipElm.innerHTML);
 	};
 
 	$scope.init();

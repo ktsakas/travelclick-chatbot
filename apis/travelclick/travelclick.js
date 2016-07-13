@@ -1,15 +1,25 @@
 const request = require('request-promise');
 const _ = require('underscore');
 
-function TravelClickAPI(hotelCode) {
-	return 1;
+function Rooms(hotelCode) {
+	this.hotelCode = hotelCode;
+
+	return this;
 }
 
-TravelClickAPI.getRooms = function () {
+Rooms.getRoom = function (roomTypeName) {
 	return request.get({
-		url : "http://localhost:" + this.port + "/hotel/" + hotelCode + "/info/rooms",
+		url : "http://localhost:" + this.port + "/hotel/" + this.hotelCode + "/info/rooms",
 		json: true
+	}).then(function (body) {
+		return 
 	});
+};
+
+Rooms.filter = function (filters) {
+	if (filter.roomType) {}
+
+	if (filter.roomAmenities) {}
 };
 
 module.exports.getRooms = ;
