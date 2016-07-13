@@ -47,6 +47,10 @@
 				<ng-include 
 					ng-if="answer.type == 'directions'" src="'map_directions.html'">
 				</ng-include>
+
+				<ng-include 
+					ng-if="answer.type == 'help'" src="'help.html'">
+				</ng-include>
 			</li>
 
 			<!-- Fit height fix -->
@@ -75,8 +79,8 @@
 	<!-- Yes/No answer template -->
 	<script type="text/ng-template" id="yes_no.html">
 	<form ng-controller="yesNoCtrl" class="temporary">
-		<button ng-click="addMessage('Yes')" class="ui msg green right pointing label">Yes</button><br />
-		<button ng-click="addMessage('No')" class="ui msg red right pointing label">No</button>
+		<button ng-click="sendMessage('Yes')" class="ui msg green right pointing label">Yes</button><br />
+		<button ng-click="sendMessage('No')" class="ui msg red right pointing label">No</button>
 	</form>
 	</script>
 
@@ -86,7 +90,7 @@
 	<div class="rooms" ng-controller="roomsCtrl">
 		<div class="ui fluid card {{answer.selectable ? 'selectable' : ''}}"
 			 ng-repeat="room in answer.rooms track by $index"
-			 ng-click="answer.selectable && addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+			 ng-click="answer.selectable && sendMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
 			<div class="content">
 				{{room.roomTypeName}}
 				<div class="meta">
@@ -105,7 +109,7 @@
 						Book
 					</button>
 					<button ng-if="answer.availButton" class="ui basic blue button"
-							ng-click="addMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+							ng-click="sendMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
 						Availability
 					</button>
 					<!--  ng-if="rooms.bookButton" -->
@@ -143,8 +147,8 @@
 	<div ng-controller="mapDirectionsCtrl">
 		<div class="map"></div>
 
-		<div class="diretions">
-			<div ng-repeat="step in directions">
+		<div class="msg directions">
+			<div class="step" ng-repeat="step in directions">
 				<span style="position: relative; margin-right: 19px;">
 					<i class="adp-maneuver adp-{{step.maneuver}}"></i>
 				</span>
@@ -152,6 +156,48 @@
 			</div>
 		</div>
 	</div>
+	</script>
+
+	<!-- Help template -->
+	<script type="text/ng-template" id="help.html">
+	<ul class="msg help">
+		<li>
+			<div class="tag">Booking:</div>
+			<a ng-click="sendMessage('Book me a single from January 1st to January 10th.')">
+				Book me a single from January 1st to January 10th.
+			</a>
+		</li>
+		<li>
+			<div class="tag">Hotel Info:</div>
+			<a ng-click="sendMessage('What is your phone number?')">
+				What is your phone number?
+			</a>
+		</li>
+		<li>
+			<div class="tag">Room Info:</div>
+			<a ng-click="sendMessage('Do your rooms have wifi?')">
+				Do your rooms have wifi?
+			</a>
+		</li>
+		<li>
+			<div class="tag">Availability:</div>
+			<a ng-click="sendMessage('Show me your availability in July.')">
+				Show me your availability in July.
+			</a>
+		</li>
+		<li>
+			<div class="tag">Address & Directions:</div>
+			<a ng-click="sendMessage('How do I get there from Boston?')">
+				How do I get there from Boston?
+			</a>
+		</li>
+		<li>
+			<div class="tag">Contact the hotel:</div>
+			<a ng-click="sendMessage('Text the hotel that I will be late.')">
+				Text the hotel that I will be late.
+			</a>
+		</li>
+	</ul>
 	</script>
 
 

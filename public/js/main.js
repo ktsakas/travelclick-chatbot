@@ -16,22 +16,13 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 		});
 	}
 
-	function handleAnswers (res) {
+	function showAnswers (res) {
 		var answers = res.data.answers;
 
-		/*$scope.messages[$scope.messages.length - 1].analysis = 
-			res.data.analysis;*/
-
-		console.log("answers: ", answers);
 		answers.forEach(function (answer) {
 			answer.owner = "bot";
 			$scope.answers.push(answer);
 		})
-		/*for (var i= 0; i < answers.length; i++) {
-			answers[i].owner = "bot";
-
-			$scope.messages.push(answers[i]);
-		}*/
 
 		$scope.disabled = false;
 		scrollToBottom();
@@ -47,10 +38,10 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 	}
 
 	$scope.submitMessage = function () {
-		$scope.addMessage($scope.newMessage);
-	}
+		$scope.sendMessage($scope.newMessage);
+	};
 
-	$scope.addMessage = function (newMsg, knownEntities) {
+	$scope.sendMessage = function (newMsg, knownEntities) {
 		var equiv = $scope.equiv;
 
 		$scope.answers.push({
@@ -71,9 +62,20 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 		// Handle server reponse
 		$http.get("/chat/" + sessionId, {
 			params: { message: newMsg, knownEntities: knownEntities }
-		}).then(handleAnswers);
+		}).then(showAnswers);
 
 	};
+
+	$scope.answers.push({
+		type: "msg",
+		owner: "bot",
+		text: "Hey, I am a chatbot. Here are some things you can ask me: ",
+	});
+
+	$scope.answers.push({
+		type: "help",
+		owner: "bot"
+	});
 
 	/*$scope.answers.push({
 		type: "rooms",

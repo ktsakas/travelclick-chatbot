@@ -8,6 +8,16 @@ body {
 	overflow: scroll;
 }
 
+a {
+	color: @blue-dark;
+	cursor: pointer;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+
 .center {
 	max-width: 700px;
 	margin: auto;
@@ -69,6 +79,18 @@ body {
 		border-radius: 3px;
 		font-weight: normal;
 		box-shadow: none;
+	}
+
+	.msg.help {
+		list-style: none;
+		line-height: 1.8em;
+	
+		.tag {
+			color: grey;
+			display: inline-block;
+			font-size: 14px;
+			width: 150px;
+		}
 	}
 
 	/* YES/NO message choice */

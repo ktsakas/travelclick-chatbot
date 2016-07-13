@@ -1,10 +1,10 @@
 app.controller("mapDirectionsCtrl", function ($scope, $element) {
 	var map = new google.maps.Map($element[0].getElementsByClassName('map')[0], {
 		zoom: 13,
-		center: {
+		/*center: {
 			lat: 37.918201,
 			lng: -92.285156
-		},
+		},*/
 		disableDefaultUI: true
 	});
 
@@ -12,11 +12,16 @@ app.controller("mapDirectionsCtrl", function ($scope, $element) {
 	var directionsDisplay = new google.maps.DirectionsRenderer;
 	directionsDisplay.setMap(map);
 
+	// Fix for partial loading problem
+	google.maps.event.addListenerOnce(map, 'idle', function() {
+		google.maps.event.trigger(map,'resize');
+	});
+
 	directionsService.route({
-		origin: {
-		lat: 37.8386741,
-		lng: -122.2936934
-		},
+		/*origin: {
+			lat: 37.8386741,
+			lng: -122.2936934
+		},*/
 		origin: "JFK Airport",
 		destination: "Port Authority Bus Terminal",
 		travelMode: google.maps.TravelMode.DRIVING
