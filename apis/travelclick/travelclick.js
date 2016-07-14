@@ -1,15 +1,27 @@
-const request = require('request-promise');
-const _ = require('underscore');
-const moment = require('moment');
-
+const request = require('request-promise'),
+	  _ = require('underscore'),
+	  moment = require('moment');
 
 var baseURL = "http://localhost:" + 3000;
 
-/* Private functions */
+/**
+ * Utility function that converts all strings in an array to lowercase.
+ * 
+ * @private
+ * @param  {array} array
+ * @return {array} updated array
+ */
 function lowercase (array) {
 	return array.map((str) => str.toLowerCase());
 }
 
+/**
+ * Filters a list of rooms based on a list of required amenities.
+ *
+ * @private
+ * @param  {array} rooms - A list of rooms.
+ * @return {array} searchAmenities - The amenities they must have.
+ */
 function filterByAmenities (rooms, searchAmenities) {
 	return rooms.filter(function (room) {
 		var roomAmenities = lowercase(_.pluck(room.amenities, 'amenityName'));
@@ -21,11 +33,23 @@ function filterByAmenities (rooms, searchAmenities) {
 	});
 }
 
+/**
+ * Filters a list of rooms based on a list of required amenities.
+ * 
+ * @private
+ * @param  {array} rooms - A list of rooms.
+ * @return {array} searchAmenities - The amenities they must have.
+ */
 function filterByMaxOccupancy (rooms, guests) {
 	return rooms.filter((room) => room.maxOccupancy == guests);
 }
 
-/* The library */
+/**
+ * Reprsents a hotel.
+ * 
+ * @constructor
+ * @param {number} hotelCode - The ID of the hotel.
+ */
 function Hotel(hotelCode) {
 	this.hotelCode = hotelCode;
 	this.getRoomsURL = baseURL + "/hotel/" + this.hotelCode + "/info/rooms";
@@ -34,6 +58,12 @@ function Hotel(hotelCode) {
 	return this;
 }
 
+/**
+ * Returns a specific room of the hotel by name.
+ * 
+ * @param {number} roomTypeName - The name of the room.
+ * @return {object} The room mached or null.
+ */
 Hotel.prototype.getRoom = function (roomTypeName) {
 	return request.get({ url: this.getRoomsURL, json: true })
 		.then((body) => body.guestRooms)
@@ -45,7 +75,13 @@ Hotel.prototype.getRoom = function (roomTypeName) {
 		});
 };
 
-
+/**
+ * Returns all rooms matching a set of filters.
+ * The filters can be dateIn, dateOut, roomAmenities, guests.
+ * 
+ * @param {object} filters
+ * @return {object} The room mached or null.
+ */
 Hotel.prototype.getRooms = function (filters) {
 	// If you are given dates use the availability API
 	if (filters.dateIn) {

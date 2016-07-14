@@ -5,6 +5,25 @@ var Hotel = require('../apis/travelclick/travelclick.js'),
 	Promise = require("bluebird");
 
 
+/* 
+ * Model of argumensts and states for the booking flow
+ */
+var model_example = {
+	// Possible output states (note these states are only for wit.ai)
+
+	/* askDateIn, askNights, askRoom, noRoomsFound, invalidArgument */
+
+	// Variables available in the booking flow
+	dateIn: "date",
+	dateOut: "date",
+	nights: "number",
+	guests: "number",
+	roomId: "number",
+	roomTypeName: "string",
+	roomType: "single" || "double" || "triple" || "quadruple",
+	errorMsg: "string"
+};
+
 /**
  * Converts roomType to number of guests (eg. double is 2 guests)
  * 
@@ -39,7 +58,7 @@ function datesToNights (dateIn, dateOut) {
 /**
  * Parses the check in date.
  * 
- * @param  {object} context - The current context.
+ * @param  {object} ctx - The current context.
  * @param  {object} entities - The message entities.
  * @return {object} The updated context.
  */
@@ -62,7 +81,7 @@ function parseDateIn (ctx, entities) {
  * Parses the check out date and calculates the number of nights the 
  * user wants to stay (dateOut - dateIn).
  * 
- * @param  {object} context - The current context.
+ * @param  {object} ctx - The current context.
  * @param  {object} entities - The message entities.
  * @return {object} The updated context.
  */
@@ -85,7 +104,7 @@ function parseDateOut (ctx, entities) {
  * Parses the check in date, check out date and number of nights.
  * This is called only when a book command is given for the first time.
  * 
- * @param  {object} context - The current context.
+ * @param  {object} ctx - The current context.
  * @param  {object} entities - The message entities.
  * @return {object} The updated context.
  */
@@ -112,7 +131,7 @@ function parseDates (ctx, entities) {
 /**
  * Parses the number of nights a the user would like to stay.
  * 
- * @param  {object} context - The current context.
+ * @param  {object} ctx - The current context.
  * @param  {object} entities - The message entities.
  * @return {object} The updated context.
  */
@@ -154,12 +173,12 @@ function parseNights (ctx, entities) {
 }
 
 /**
- * Calculates the number of nights based on the check in and
- * check out dates.
+ * Parses a specific room either by name or by ID.
  * 
- * @param  {string} dateIn - The check in date.
- * @param  {string} dateOut - The check out date.
- * @return {number} The number of nights.
+ * @param  {string} text - The user message.
+ * @param  {object} ctx - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} The updated context or a promise that resolves with it.
  */
 function parseSpecificRoom (text, ctx, entities) {
 	if (entities.roomId && (!entities.roomTypeName || !entities.roomType)) {
@@ -185,12 +204,20 @@ function parseSpecificRoom (text, ctx, entities) {
 	}
 }
 
+/**
+ * Parses any room details found in the user message (that is room name and room type).
+ * 
+ * @param  {string} text - The user message.
+ * @param  {object} ctx - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} The updated context.
+ */
 function parseRoomDetails (text, ctx, entities) {
 	if (entities.roomId && (!entities.roomTypeName || !entities.roomType)) {
 		throw new Error("If the room ID is known we should also know the room type and room name.");
 	}
 
-	if (entities.roomId || entities.roomTypeName) {
+	if (entities.roomTypeName) {
 		return parseSpecificRoom(text, ctx, entities);
 	} else if (entities.roomType) {
 		ctx.roomType = entities.roomType;
@@ -200,6 +227,13 @@ function parseRoomDetails (text, ctx, entities) {
 	}
 }
 
+/**
+ * Finds all rooms matching the criteria of the current context
+ * and updates the context with how many rooms where found.
+ * 
+ * @param  {object} ctx - The current context.
+ * @return {object} Promise that resolves with the updated context.
+ */
 function findRooms (ctx) {
 	var p;
 
@@ -232,6 +266,14 @@ function findRooms (ctx) {
 	return p;
 }
 
+/**
+ * Clears all state values from the context.
+ * State values are an indicator for Wit.ai to decide the next action
+ * and should not be used as input to parse the context.
+ * 
+ * @param  {object} ctx - The current context.
+ * @return {object} The updated context.
+ */
 function clearState (ctx) {
 	delete ctx.askDateIn;
 	delete ctx.askNights;
@@ -243,6 +285,12 @@ function clearState (ctx) {
 	return ctx;
 }
 
+/**
+ * Updates the output state to tell Wit.ai what the next action should be.
+ * 
+ * @param  {object} ctx - The current context.
+ * @return {object} The updated context.
+ */
 function setNextState (ctx) {
 	if      (ctx.roomsFoundCount == 0) ctx.noRoomsFound = true; 
 	else if (ctx.errorMsg) ctx.invalidArgument = true;
@@ -253,21 +301,16 @@ function setNextState (ctx) {
 	return ctx;
 }
 
-/* Model of argumensts and states for booking flow */
-var model_example = {
-	// Possible output states (note these states are only for wit.ai)
-	/* askDateIn, askNights, askRoom, noRoomsFound, invalid */
 
-	// Required variables to complete booking
-	dateIn: "date",
-	dateOut: "date",
-	nights: "number",
-	guests: "number",
-	roomId: "number",
-	roomTypeName: "string",
-	roomType: "single" || "double" || "triple" || "quadruple"
-};
-
+/**
+ * Parses all data related to the booking flow.
+ * This is called every time merge is called and we are in the booking flow.
+ * 
+ * @param  {string} text - The user message.
+ * @param  {object} ctx - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} A promise that resolves with the updated context.
+ */
 module.exports = function (text, ctx, entities) {
 	var p = Promise.resolve(ctx);
 
