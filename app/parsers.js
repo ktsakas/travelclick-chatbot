@@ -2,6 +2,8 @@ const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 	  HotelInfo = require('../apis/travelclick/hotel-info.js'),
 	  Availability = require('../apis/travelclick/availability.js');
 
+var bookParser = require('./book-parser.js');
+
 var moment = require('moment');
 
 module.exports = function (chat) {
@@ -62,8 +64,15 @@ module.exports = function (chat) {
 			return context;
 		},
 
-
 		book: function (text, context, entities) {
+			return bookParser(text, context, entities).then(function (context) {
+				console.log("PARSED CONTEXT: ", context);
+				
+				return context;
+			})
+		},
+
+		/*book: function (text, context, entities) {
 			if (entities.roomTypeName) context.roomTypeName = entities.roomTypeName;
 			if (entities.roomId) {
 				context.roomId = entities.roomId;
@@ -93,15 +102,15 @@ module.exports = function (chat) {
 					context.dateOut = moment(context.dateIn).add(entities.nights, 'days').format('YYYY-MM-DD');
 				
 					console.log("FILLED DATE OUT!", context.dateOut);
-				}/* else {
+				} else {
 					this.addMessage("I didn't get that. How many nights are you staying?");
-				}*/
+				}
 			} else if (!context.guests) {
 				context.guests = entities.guests;
 
-				/*if (!entities.guests) {
+				if (!entities.guests) {
 					this.addMessage("I expected the number of guests. Could you repeat that?")
-				}*/
+				}
 			}
 
 			if (!context.dateIn) context.askDateIn = true;
@@ -109,7 +118,7 @@ module.exports = function (chat) {
 			else if (!context.roomId) context.askRoom = true;
 
 			return context;
-		},
+		},*/
 
 		directions: function (text, context, entities) {
 			delete context.askFromLocation;

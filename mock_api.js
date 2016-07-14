@@ -17,8 +17,77 @@ Array.prototype.shuffle = function() {
 	return input;
 }
 
+var alwaysAmenities = [ "coffeemaker", "alarm", "air condition" ];
+var randAmenities = [
+	"wifi", "tv", "telephone", "bathtub", "bathroom", "kitchen", "ocean view"
+];
+
 app.get('/check', function (req, res) {
 	res.json({ 'check': 'fine' });
+});
+
+app.get('/hotel/:hotelCode/avail', function (req, res) {
+	dateIn = moment(req.query.dateIn, 'YYYY-MM-DD');
+	dateOut = moment(req.query.dateOut, 'YYYY-MM-DD');
+
+	var results = {
+		hotelCode: req.params.hotelCode,
+		currencyCode: 'eur',
+		languageCode: "EN_US",
+		hasMandatoryServices: false,
+		roomStays: [{
+			timeSpan: {
+				start: req.query.dateIn,
+				end: req.query.dateOut,
+				duration: dateOut.diff(dateIn, 'days')
+			},
+			roomTypes: []
+		}]
+	};
+
+	for (var i= 0; i < 5; i++) {
+		var roomType = {
+			id: 1534 + i,
+			roomTypeName: faker.company.companyName(),
+			roomTypeCode: "173793",
+			description: faker.lorem.paragraph(),
+			sortOrder: 1,
+			amenities: [],
+			averageRates: [],
+			roomFeatures: [],
+		};
+
+		randAmenities.shuffle();
+		for (var k= 0; k < 5; k++) {
+			roomType.amenities.push({
+				amenityName: randAmenities[k],
+				sortOrder: 0,
+				isPremiumAmenity: false,
+				image: {
+					type: "icon",
+					source: "http://lorempixel.com/200/150/city/1/",
+					sortOrder: 0
+				}
+            });
+		}
+
+		for (var j= 0; j < 3; j++) {
+			roomType.amenities.push({
+				amenityName: alwaysAmenities[j],
+				sortOrder: 0,
+				isPremiumAmenity: false,
+				image: {
+					type: "icon",
+					source: "http://lorempixel.com/200/150/city/1/",
+					sortOrder: 0
+				}
+            });
+		}
+
+		results.roomStays[0].roomTypes.push(roomType);
+	}
+
+	res.json(results);
 });
 
 app.get('/hotel/:hotelCode/basicavail', function (req, res) {
@@ -112,11 +181,6 @@ app.get('/hotel/:hotelCode/info', function (req, res) {
 });
 
 app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
-	var alwaysAmenities = [ "coffeemaker", "alarm", "air condition" ];
-	var randAmenities = [
-		"wifi", "tv", "telephone", "bathtub", "bathroom", "kitchen", "ocean view"
-	];
-
 	var result = {
 		hotelCode: req.params.hotelCode,
 		hotelName: faker.company.companyName(),
@@ -133,15 +197,13 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 		var roomType = {
 			id: 1534 + i,
 			roomTypeName: faker.company.companyName(),
-			maxOccupancy: 4,
+			maxOccupancy: 1,
 			maxAdultOccupancy: 3,
 			maxChildOccupancy: 1,
 			description: faker.lorem.paragraph(),
 
 			amenities: []
 		};
-
-		result.guestRooms.push(roomType);
 
 		randAmenities.shuffle();
 		for (var k= 0; k < 5; k++) {
@@ -175,6 +237,8 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 				sortOrder: 0
 			});
 		}
+
+		result.guestRooms.push(roomType);
 	}
 
 	res.json(result);

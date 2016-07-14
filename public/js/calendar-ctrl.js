@@ -27,15 +27,15 @@ app.controller("calendarCtrl", function ($scope, $element) {
 							+ "[data-pika-month=" + month + "]"
 							+ "[data-pika-year=" + year + "]");
 
-						$("button[data-pika-day=" + monthDay + "]"
+						$element.find("button[data-pika-day=" + monthDay + "]"
 							+ "[data-pika-month=" + month + "]"
 							+ "[data-pika-year=" + year + "]")
 							.addClass(day.isAvailable ? 'avail' : 'booked');
 					});
 				}
 
-				$("button[data-pika-day=14]").addClass('avail');
-				$("button[data-pika-day=15]").addClass('booked');
+				$element.find("button[data-pika-day=14]").addClass('avail');
+				$element.find("button[data-pika-day=15]").addClass('booked');
 
 
 				if (dateIn && dateOut) {
@@ -45,7 +45,7 @@ app.controller("calendarCtrl", function ($scope, $element) {
 					do {
 						// console.log(selectDate.get('date'), dateOut.getDate());
 
-						$("button[data-pika-day=" + selectDate.get('date') + "][data-pika-month=" + selectDate.get('month') + "]")
+						$element.find("button[data-pika-day=" + selectDate.get('date') + "][data-pika-month=" + selectDate.get('month') + "]")
 							.addClass('selected');
 
 					} while (!selectDate.isSame(dateOut) && selectDate.add(1, 'days'));

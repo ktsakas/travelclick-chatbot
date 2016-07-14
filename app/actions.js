@@ -3,6 +3,8 @@ const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 	  Availability = require('../apis/travelclick/availability.js'),
 	  Parsers = require('./parsers');
 
+var Promise = require('bluebird');
+
 module.exports = function (chat) {
 	var parsers = new Parsers(chat);
 
@@ -25,28 +27,37 @@ module.exports = function (chat) {
 		merge: function (text, context, entities, cb) {
 			console.log('merging: ', text, entities, context);
 
-			if (entities.intent) {
+			if (entities.intent && !context[entities.intent]) {
 				context[entities.intent] = true;
+				delete entities.intent;
+
+				entities.newCommand = true;
 			}
 
+			var p;
 			if (context.book) {
-				context = parsers.book(text, context, entities);
+				p = parsers.book(text, context, entities);
 			} else if (context.availability) {
-				context = parsers.availability(text, context, entities);
+				p = Promise.resolve( parsers.availability(text, context, entities) );
 			} else if (context.directions) {
-				context = parsers.directions(text, context, entities);
+				p = Promise.resolve( parsers.directions(text, context, entities) );
 			} else if (context.hotelInfo) {
-				context = parsers.hotelInfo(text, context, entities);
+				p = Promise.resolve( parsers.hotelInfo(text, context, entities) );
 			} else if (context.roomInfo) {
-				context = parsers.roomInfo(text, context, entities);
+				p = Promise.resolve( parsers.roomInfo(text, context, entities) );
 			} else if (context.text) {
 				console.log("PARSING TEXT");
-				context = parsers.text(text, context, entities);
+				p = Promise.resolve( parsers.text(text, context, entities) );
 			} else {
 				context.unknown = true;
+				p = Promise.resolve(context);
 			}
 
-			cb(context);
+			p.then(function (context) {
+				console.log("MERGED: ", context);
+
+				return context;
+			}).then((context) => cb(context));
 		},
 
 		book: function (context, cb) {

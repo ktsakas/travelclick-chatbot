@@ -1,119 +1,256 @@
-/* BOOKING PARSER */
+const moment = require("moment"),
+	  dateFormat = "YYYY-MM-DD";
 
-function datesToNights (dateIn, dateOut) {
-	return moment(dateIn).diff(dateOut);
+var Hotel = require('../apis/travelclick/travelclick.js'),
+	Promise = require("bluebird");
+
+
+/**
+ * Converts roomType to number of guests (eg. double is 2 guests)
+ * 
+ * @param  {string} roomType - The check in date.
+ * @return {number} The number of guests.
+ */
+function roomTypeToGuests (roomType) {
+	var roomTypes = ['single', 'double', 'triple', 'quadruple'];
+
+	if ( roomTypes.indexOf(roomType) != -1 ) {
+		return roomTypes.indexOf(roomType) + 1;
+	} else {
+		throw Error("Invalid room type!");
+	}
 }
 
-function parseDateIn (context, entities) {
-	if (context.dateIn < today) {
-		context.errorMsg = "Your check in day is in the past. Could you try again?";
-		return context;
+/**
+ * Calculates the number of nights based on the check in and
+ * check out dates.
+ * 
+ * @param  {string} dateIn - The check in date.
+ * @param  {string} dateOut - The check out date.
+ * @return {number} The number of nights.
+ */
+function datesToNights (dateIn, dateOut) {
+	var mDateIn = moment(dateIn, dateFormat),
+		mDateOut = moment(dateOut, dateFormat)
+
+	return mDateOut.diff(mDateIn, 'days');
+}
+
+/**
+ * Parses the check in date.
+ * 
+ * @param  {object} context - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} The updated context.
+ */
+function parseDateIn (ctx, entities) {
+	if ( moment(ctx.dateIn, dateFormat).diff(new Date(), 'days') < 0) {
+		ctx.errorMsg = "Your check in day is in the past. Could you try again?";
+		return ctx;
 	}
 
 	if (entities.dates[0]) {
-		context.dateIn = entities.dates[0];
+		ctx.dateIn = entities.dates[0];
 	} else {
-		context.errorMsg = "I expected a date, could you repeat that?";
+		ctx.errorMsg = "I expected a date, could you repeat that?";
 	}
 
-	return context;
+	return ctx;
 }
 
-function parseDateOut (context, entities) {
-	if (!context.dateIn) throw Error("Missing date in.");
+/**
+ * Parses the check out date and calculates the number of nights the 
+ * user wants to stay (dateOut - dateIn).
+ * 
+ * @param  {object} context - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} The updated context.
+ */
+function parseDateOut (ctx, entities) {
+	if (!ctx.dateIn) throw Error("Missing date in.");
 
-	if (entities.dates[0] || entities.dates[1]) {
-		context.dateOut = entities.dates[0] || entities.dates[1];
+	if (entities.dates[1] || entities.dates[0]) {
+		ctx.dateOut = entities.dates[1] || entities.dates[0];
 
 		// Once we have dateIn and dateOut we can calulate the number of nights
-		context.nights = datesToNights(context.dateIn, context.dateOut);
+		ctx.nights = datesToNights(ctx.dateIn, ctx.dateOut);
 	} else {
-		context.errorMsg = "I expected a check out date, could you repeat that?";
+		ctx.errorMsg = "I expected a check out date, could you repeat that?";
 	}
 
-	return context;
+	return ctx;
 }
 
-function parseDates (context, entities) {
+/**
+ * Parses the check in date, check out date and number of nights.
+ * This is called only when a book command is given for the first time.
+ * 
+ * @param  {object} context - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} The updated context.
+ */
+function parseDates (ctx, entities) {
 	if (entities.dates.length > 2) {
-		context.errorMsg = "You entered too many dates. Could you try again?";
-		return context;
+		ctx.errorMsg = "You entered too many dates. Could you try again?";
+		return ctx;
 	}
 
-	if (!context.dateIn) {
-		context = parseDateIn(context, entities);
+	if (!ctx.dateIn) {
+	console.log("PARSING DATE IN : ", ctx);
+		ctx = parseDateIn(ctx, entities);
 
-		// Date out is optional at this stage so only check it if there are two dates
-		if (entities.dates[1]) parseDateOut(context, entities);
+		// Chech if the user provided dateOut or number of nights
+		if (entities.dates[1]) parseDateOut(ctx, entities);
+		if (entities.number) parseNights(ctx, entities);
 	}
 
-	if (entities.nights) parseNights(context, entities);
+	if (entities.nights) parseNights(ctx, entities);
 
-	return context;
+	return ctx;
 }
 
-function parseNights (context, entities) {
-	if (!context.dateIn) throw Error("Missing date in.");
+/**
+ * Parses the number of nights a the user would like to stay.
+ * 
+ * @param  {object} context - The current context.
+ * @param  {object} entities - The message entities.
+ * @return {object} The updated context.
+ */
+function parseNights (ctx, entities) {
+	if (!ctx.dateIn) throw Error("Missing date in.");
+
+	// Identify any number as the number of nights
+	// this is prone to error, but can be fixed using roles
+	// in the future look at (https://github.com/wit-ai/wit/issues/253)
+	entities.nights = entities.number;
 
 	if (!entities.nights) {
-		context.erroMsg = "I expected a number, could you try again?";
-		return context;
+		ctx.erroMsg = "I expected a number, could you try again?";
+		return ctx;
 	}
 
 	// If the number of nights does not match the dates give an error
-	if (context.dateIn && context.dateOut && entities.nights &&
-		entities.nights != datesToNights(context.dateIn, context.dateOut) ) {
-		delete context.dateIn;
-		delete context.dateOut;
+	if (ctx.dateIn && ctx.dateOut && entities.nights &&
+		entities.nights != datesToNights(ctx.dateIn, ctx.dateOut) ) {
+		delete ctx.dateIn;
+		delete ctx.dateOut;
 
-		context.errorMsg = 
+		ctx.errorMsg = 
 			"I am not sure when you are trying to book for, could you give me the dates again?";
 
-		return context;
+		return ctx;
 	}
 
-	// Add nights to context
-	if (entities.nights) context.nights = entities.nights;
+	// Add nights to ctx
+	if (entities.nights) ctx.nights = entities.nights;
 
 	// If date in and nights are given we can caculate date out
-	if (context.dateIn && context.nights) {
-		context.dateOut = moment(context.dateIn).add(context.nights, 'days').format( --- );
+	if (ctx.dateIn && ctx.nights) {
+		ctx.dateOut =
+			moment(ctx.dateIn).add(ctx.nights, 'days').format("YYYY-MM-DD");
 	}
 
-	return context;
+	return ctx;
 }
 
-function parseRoom (text, context, entities) {
-	if (context.roomId && (!context.roomTypeName || !context.roomType)) {
+/**
+ * Calculates the number of nights based on the check in and
+ * check out dates.
+ * 
+ * @param  {string} dateIn - The check in date.
+ * @param  {string} dateOut - The check out date.
+ * @return {number} The number of nights.
+ */
+function parseSpecificRoom (text, ctx, entities) {
+	if (entities.roomId && (!entities.roomTypeName || !entities.roomType)) {
 		throw new Error("If the room ID is known we should also know the room type and room name.");
 	}
 
-	if (context.roomTypeName) // query to find roomType and roomId
-}
+	if (entities.roomId) {
+		ctx.roomId = entities.roomId;
+		ctx.roomTypeName = entities.roomTypeName;
+		ctx.roomType = entities.roomType;
 
-function countRoomsFound (context) {
-	if (context.roomId) {
+		return ctx;
+	} else if (entities.roomTypeName) {
+		return new Hotel(1098).getRoom(entities.roomTypeName)
+			.then(function (room) {
+				ctx.roomId = room.id;
+				ctx.roomTypeName = room.roomTypeName;
+				ctx.roomType = room.roomType;
+				ctx.guests = roomTypeToGuests(ctx.roomType);
 
-	} else {
-
+				return ctx;
+			});
 	}
 }
 
-function clearState (context) {
-	delete context.askDateIn;
-	delete context.askNights;
-	delete context.askRoom;
-	delete context.noRoomsFound;
-	delete context.invalidArgument;
-	delete context.errorMsg;
+function parseRoomDetails (text, ctx, entities) {
+	if (entities.roomId && (!entities.roomTypeName || !entities.roomType)) {
+		throw new Error("If the room ID is known we should also know the room type and room name.");
+	}
+
+	if (entities.roomId || entities.roomTypeName) {
+		return parseSpecificRoom(text, ctx, entities);
+	} else if (entities.roomType) {
+		ctx.roomType = entities.roomType;
+		ctx.guests = roomTypeToGuests(entities.roomType);
+
+		return ctx;
+	}
 }
 
-function setNextState (context) {
-	if      (!context.matchingRooms == 0) context.noRoomsFound = true; 
-	else if (context.errorMsg) context.invalidArgument = true;
-	else if (!context.dateIn)  context.askDateIn = true;
-	else if (!context.nights)  context.askNights = true;
-	else if (!context.roomId)  context.askRoom   = true;
+function findRooms (ctx) {
+	var p;
+
+	// If we have a specific name get the specific room
+	if (ctx.roomTypeName) {
+		p = new Hotel(1098)
+			.getRoom(ctx.roomTypeName)
+			.then(function (room) {
+				if (room) ctx.roomsFoundCount = 1;
+				else      ctx.roomsFoundCount = 0;
+
+				return ctx;
+			});
+
+	// Otherwise find the rooms matching the criteria
+	} else {
+		p = new Hotel(1098)
+			.getRooms({
+				dateIn: ctx.dateIn || null,
+				dateOut: ctx.dateOut || null,
+				roomAmenities: ctx.amenity ? [ctx.amenity] : [],
+				guests: ctx.guests || null
+			})
+			.then(function (rooms) {
+				ctx.roomsFoundCount = rooms.length;
+				return ctx;
+			});
+	}
+
+	return p;
+}
+
+function clearState (ctx) {
+	delete ctx.askDateIn;
+	delete ctx.askNights;
+	delete ctx.askRoom;
+	delete ctx.noRoomsFound;
+	delete ctx.invalidArgument;
+	delete ctx.errorMsg;
+
+	return ctx;
+}
+
+function setNextState (ctx) {
+	if      (ctx.roomsFoundCount == 0) ctx.noRoomsFound = true; 
+	else if (ctx.errorMsg) ctx.invalidArgument = true;
+	else if (!ctx.dateIn)  ctx.askDateIn = true;
+	else if (!ctx.nights)  ctx.askNights = true;
+	else if (!ctx.roomId)  ctx.askRoom   = true;
+
+	return ctx;
 }
 
 /* Model of argumensts and states for booking flow */
@@ -131,30 +268,34 @@ var model_example = {
 	roomType: "single" || "double" || "triple" || "quadruple"
 };
 
-module.exports = function (text, context, entities) {
-	
+module.exports = function (text, ctx, entities) {
+	var p = Promise.resolve(ctx);
+
 	// If this is a new command
 	// or no rooms matching the query where found
-	if (entities.intent || context.noRooms) {
+	if (entities.newCommand || ctx.noRooms) {
 
-		context = parseRoomType(context, entities);
-
-		if      (entities.dates)        parseDates(context, entities);
-		else if (entities.roomTypeName) parseRooms(context, entities);
+		if (entities.dates) {
+			p = p.then((ctx) => parseDates(ctx, entities));
+		} else if (entities.roomTypeName || entities.roomType) {
+			p = p.then((ctx) => parseRoomDetails(text, ctx, entities));
+		}
 
 	// Note: this will also run if some argument is invalid (errorMsg state)
 	} else {
+
 		// Parse one missing argument at a time
-		if      (!context.dateIn) context = parseDates(context, entities);
-		else if (!context.nights) context = parseNights(context, entities);
-		else if (!context.roomId) context = parseRoom(context, entities);
+		if      (!ctx.dateIn) p = p.then((ctx) => parseDates(ctx, entities));
+		else if (!ctx.nights) p = p.then((ctx) => parseNights(ctx, entities));
+		else if (!ctx.roomId) p = p.then((ctx) => parseSpecificRoom(text, ctx, entities));
 	}
 	
-	context = countRoomsFound(context);
-	
-	// If the arguments are valid, always check if any rooms match those arguments
-	context = clearState(context);
-	context = setNextState(context);
+	return p.then(findRooms)
+	 .then(clearState)
+	 .then(setNextState)
+	 .then(function (ctx) {
+	 	console.log("BOOKING PARSER RESULT: ", ctx);
 
-	return context;
+	 	return ctx;
+	 });
 };
