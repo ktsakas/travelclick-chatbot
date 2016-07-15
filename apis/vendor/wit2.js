@@ -1,4 +1,5 @@
-const l = require('winston'),
+const config = require('../../app/config.js'),
+	  l = config.logger,
 	  uuid = require('node-uuid'),
 	  EventEmitter = require('events').EventEmitter,
 	  util = require('util'),
@@ -6,8 +7,12 @@ const l = require('winston'),
 	  _ = require('underscore'),
 	  moment = require('moment');
 
-l.level = 'silly';
-
+/**
+ * API wrapper class for Wit.ai.
+ * 
+ * @constructor
+ * @param {[type]}
+ */
 function WitAPI (token) {
 	var version = '20160706';
 
