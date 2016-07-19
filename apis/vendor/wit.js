@@ -1,128 +1,120 @@
-const l = require('winston');
-l.level = 'silly';
+const config = require('../../app/config.js'),
+	  l = config.logger,
+	  uuid = require('node-uuid'),
+	  EventEmitter = require('events').EventEmitter,
+	  util = require('util'),
+	  request = require('request-promise'),
+	  _ = require('underscore'),
+	  moment = require('moment');
 
-const fetch = require('node-fetch');
-const uuid = require('node-uuid');
-const EventEmitter = require('events').EventEmitter;
-const DEFAULT_API_VERSION = '20160629';
+/**
+ * @class     WitAPI
+ * @classdesc API wrapper class for Wit.ai.
+ */
+class WitAPI extends EventEmitter {
+	constructor (token) {
+		super();
 
-function WitAPI (token) {
-	const baseURL = process.env.WIT_URL || 'https://api.wit.ai';
-	const version = process.env.WIT_API_VERSION || DEFAULT_API_VERSION;
-	const headers = {
-		'Authorization': 'Bearer ' + token,
-		'Accept': 'application/vnd.wit.' + version + '+json',
-		'Content-Type': 'application/json',
-	};
+		var version = '20160706';
 
-	this.token = token;
+		this.queryData = {
+			v: version,
+			session_id: uuid.v1()
+		};
 
-	// Constructor for new stories
-	function Story(actions) {
-		this.context = {};
-		this.sessionId = uuid.v1();
-		this.actions = actions;
-		this.nextAction = "";
-		this.stopped = false;
-
-		return this;
-	}
-
-	Story.prototype = EventEmitter.prototype;
-
-	function queryProp(object, query) {
-		query = query.split(".");
-
-		for (var i= 0; i < query.length; i++) {
-			if ( object.hasOwnProperty(query[i]) ) {
-				object = object[query[i]];
-			} else {
-				l.error("Property " + query[i] + " not found in object!");
-				return null;
+		this.req = request.defaults({
+			baseUrl: 'https://api.wit.ai',
+			headers: {
+				'Authorization': 'Bearer ' + token,
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
 			}
-		}
+		});
 
-		return object;
-	}
-
-	function setObjectPathValue(source, path, value) {
-		var parts = path.split('.'), len = parts.length, target = source;
-
-		for (var i = 0, part; i < len - 1; i++) {
-			part = parts[i];
-			target = target[part] == undefined ? (target[part] = {}) : target[part];
-		}
-		target[parts[len - 1]] = value;
-		return target;
-	}
-
-	Story.prototype.next = function (message) {
-		var q = 'session_id=' + this.sessionId;
-		if (message) q += '&q=' + encodeURIComponent(message);
-
-		console.log("sent context: ", this.context);
-		fetch(baseURL + '/converse?' + q, {
-			method: 'POST',
-			headers: headers,
-			body: JSON.stringify(this.context),
-		})
-		.then(response => response.json())
-		.then(this.callAction.bind(this))
-		.catch(this.callAction.bind(this));
-	};
-
-	Story.prototype.addAnswer = function (answer) {
-		this.answers.push(answer);
-	};
-
-	Story.prototype.callAction = function (res) {
-		// console.log("called action!", res);
-		l.debug("action call type: ", res.type);
-		if (res.type == "msg") {
-			this.actions.say.call(this, this.context, res.msg);
-		} else if (res.type == "merge") {
-			this.actions.merge.call(this, this.context, res.entities, res.answer);
-		} else  if (res.type == "action") {
-			var action = queryProp(this.actions, res.action);
-
-			if (action) action.call(this, this.context);
-			else return;
-		} else if (res.type == "stop") {
-			this.wait();
-			return;
-		}
-
-		l.debug("has stopped: ", this.stopped, "\n");
-		if (!this.stopped) this.next();
-	};
-
-	Story.prototype.continue = function (message) {
-		this.stopped = false;
-		this.answers = [];
-
-		// console.log(this);
-		this.next(message);
-	};
-
-	Story.prototype.wait = function () {
-		this.stopped = true;
-		this.emit("stopped", this.answers, this.context);
-		console.log("emmited stopped!\n");
-	};
-
-	Story.prototype.set = function (property, value) {
-		this.context[property] = value;
-	};
-
-	Story.prototype.reset = function () {
 		this.context = {};
-		this.answers = [];
-	};
 
+		// this.actions = actions;
+		this.actions = {};
+	}
 
-	return {
-		Story: Story
-	};
-};
+	/**
+	 * Set the action that will be called for a particular Wit action.
+	 * 
+	 * @param  {String} action - the name of the action
+	 * @param  {Function} fn - to be called for the action
+	 */
+	action (action, fn) {
+		this.actions[action] = fn;
+	}
+
+	/**
+	 * Will call an action with the given parameters.
+	 *
+	 * @private
+	 * @param  {String} action - name of the action to be called
+	 */
+	callAction(action) {
+		if (!this.actions[action]) throw "Action " + action + " does not exist!";
+
+		var restArgs = Array.prototype.slice.call(arguments, [1]);
+		// console.log("rest args: ", restArgs);
+		this.actions[action].apply(this, restArgs);
+	}
+
+	/**
+	 * Sends a query to Wit.ai with the given text
+	 * and based on the response calls the appropriate actions.
+	 *
+	 * @param  {String}  text input by the user to send to Wit
+	 * @return {Promise}
+	 */
+	query (text) {
+		var self = this;
+
+		l.info("querying with: ", self.context, text);
+		this.req.post({
+			url: "/converse",
+			qs: Object.assign(text ? { q: text } : {}, this.queryData),
+			body: self.context,
+			json: true
+		}).catch(
+			(err) => l.error(" -- wit query -- ", err)
+		).then(function (body) {
+			 if (body.type == "merge") {
+			 	l.info("MERGING");
+				// l.info("merge body: ", body);
+				self.callAction('merge', text, self.context, body.entities || {}, function (mergedCtx) {
+					self.context = mergedCtx;
+
+					self.query();
+				});
+			} else if (body.type == "msg") {
+			 	l.info("SAYING", body);
+				self.callAction('say', body);
+				self.query();
+			} else if (body.type == "action") {
+				self.callAction(body.action, self.context, function (newCtx) {
+					self.context = newCtx;
+
+					// l.info("action ctx: ", self.context);
+					self.query();
+				});
+			} else if (body.type == "stop") {
+			 	l.info("STOPPING");
+				l.info(self.context);
+				self.callAction('stop');
+				return;
+			}
+		});
+	}
+
+	/**
+	 * Reset the session id for wit.
+	 * This should be called when then intent changes.
+	 */
+	reset () {
+		this.queryData.session_id = uuid.v1();
+	}
+}
 
 module.exports = WitAPI;

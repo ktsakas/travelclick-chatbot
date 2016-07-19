@@ -7,10 +7,12 @@
 // Import NPM libraries
 const l = require('winston'),
 	  _ = require('underscore'),
+	  config = require('./config'),
 	  async = require('async'),
 	  EventEmitter = require('events').EventEmitter,
-	  util = require('util');
-const moment = require('moment');
+	  util = require('util'),
+	  moment = require('moment'),
+	  Actions = require('./actions');
 
 // Show all debug messages
 l.level = 'silly';
@@ -19,18 +21,16 @@ l.level = 'silly';
 const WatsonAPI = require('../apis/vendor/watson'),
 	  BingAPI = require('../apis/vendor/bing'),
 	  TwilioAPI = require('../apis/vendor/twilio'),
-	  AIAPI = require('../apis/vendor/api_ai');
+	  WitAPI = require('../apis/vendor/wit');
 
-
-const RoomAmenities = require('./room-amenities'),
-	  HotelInfo = require('./hotel-info'),
-	  Availability = require('./availability');
+const parsers = require('./parsers')
 
 
 function ChatBot () {
 	this.answers = [];
 	this.unsent = [];
-	this.ai = new AIAPI();
+	this.actions = new Actions(this);
+	this.ai = new WitAPI(config.witai.token);
 
 	this.setupActions();
 
@@ -39,52 +39,58 @@ function ChatBot () {
 
 util.inherits(ChatBot, EventEmitter);
 
-ChatBot.prototype.parseDates = function (params) {
-	var dateIn = params['dateIn'],
-		nights = params['nights'],
-		datePeriod = params['datePeriod'];
-
-	if (datePeriod) {
-		console.log('datePeriod: ', datePeriod);
-		var datePeriod = params['datePeriod'].split('/');
-		params['dateIn'] = datePeriod[0];
-		params['nights'] = {
-			number: moment(datePeriod[1], "YYYY-MM-DD").diff(params['dateIn'], 'days')
-		};
-		// console.log(moment(params['dateIn'], "YYYY-MM-DD").toString(),
-			// moment(datePeriod[1], "YYYY-MM-DD").toString());
-	} else if (dateIn && nights) {
-		var dateOut = moment(dateIn, "YYYY-MM-DD").add(+nights.number, 'd').format("YYYY-MM-DD");
-		params['datePeriod'] = dateIn + "/" + dateOut;
-	}
-	// console.log("parsedDates: ", params);
-
-	return params;
+ChatBot.prototype.addAnswer = function (answer) {
+	this.unsent.push(answer);
 };
 
-ChatBot.prototype.parseGuests = function (params) {
-	var roomTypes = ['single', 'double', 'triple'],
-		guests = params['guests'],
-		roomType = params['roomType'];
+ChatBot.prototype.addMessage = function (message) {
+	this.unsent.push({
+		type: "msg",
+		text: message
+	});
+};
 
-	if (guests) {
-		params['roomType'] = roomTypes[guests.number - 1];
-	} else if (roomType) {
-		if (roomType.match(/single/i)) {
-			params['guests'] = { number: 1 };
-		} else if (roomType.match(/double/i)) {
-			params['guests'] = { number: 2 };
-		} else if (roomType.match(/triple/i)) {
-			params['guests'] = { number: 3 };
+ChatBot.prototype.normalize = function (entities) {
+	var firstValEntities = [
+		'intent', 'textCommand', 'yes_no', 'nights', 'guests', 'roomType', 'location', 'hotelInfo', 'number', 'roomAmenity'
+	];
+
+	/*
+	* Pick out the first value for each of the entities
+	*/
+	for (var name in entities) {
+		if ( _.contains(firstValEntities, name) ) {
+			// console.log("entities[" + name + "]: " + entities[name]);
+			entities[name] = entities[name][0].value;
 		}
 	}
-	// console.log("parsedGuests: ", params);
 
-	return params;
+	return entities;
 };
 
-ChatBot.prototype.addAnswer = function (message) {
-	this.unsent.push(message);
+
+ChatBot.prototype.parseDates = function (entities) {
+	if (!entities.datetime) return entities;
+
+	console.log("datetime: ", entities.datetime)
+
+	if (entities.datetime[0].type == "interval") {
+		entities.dates = [
+			entities.datetime[0].from.value.split('T')[0],
+			entities.datetime[0].to.value.split('T')[0]
+		];
+	} else {
+		entities.dates = [ entities.datetime[0].value.split('T')[0] ];
+
+		if (entities.datetime[0].grain == "month") {
+			entities.dates[1] = 
+				moment(entities.dates[0]).add(1, 'months').subtract(1, 'days').format('YYYY-MM-DD');
+		}
+	}
+
+	delete entities.datetime;
+
+	return entities;
 };
 
 ChatBot.prototype.popUnsent = function (message) {
@@ -95,182 +101,60 @@ ChatBot.prototype.popUnsent = function (message) {
 	return results;
 };
 
-ChatBot.prototype.setupActions = function (message) {
+ChatBot.prototype.setupActions = function () {
 	var self = this;
 
-	this.ai.on('say', (answer) => {
-		self.addAnswer({
-			type: "msg",
-			text: answer
-		});
+	Object.keys(this.actions).forEach(function (action) {
+		if (action == 'say') {
+			self.ai.action('say', self.actions.say);
 
-		self.emit("respond", self.popUnsent());
-	});
+		} else if (action == 'merge') {
+			self.ai.action(action, function (text, context, entities, cb) {
+				console.log("merge: ", text, context, entities, cb);
 
-	/*this.ai.addParser('book', this.parseDates);
-	this.ai.addParser('book', this.parseGuests);
+				if (entities) {
+					// Normalize the entities first
+					entities = self.normalize(entities);
 
-	this.ai.addParser('availability', this.parseDates);
-	this.ai.addParser('availability', this.parseGuests);
-*/
-	this.ai.on('book', (params) => {
-		console.log("got to book");
-
-		self.addAnswer({
-			type: 'msg',
-			text: 'Thank you for booking with us! Redirecting to the payment page...'
-		});
-
-		self.addAnswer({
-			type: 'redirect',
-			url: "https://www.paypal.com"
-		})
-
-		self.emit("respond", self.popUnsent());
-	});
-
-	this.ai.on('availability', (params) => {
-		console.log("params: ", params);
-
-		params = Availability.parseOptions(params);
-
-		console.log("parsed params: ", params);
-
-		Availability.get(params, function (err, available) {
-			// console.log("available: ", available);
-
-			self.addAnswer({
-				type: 'msg',
-				text: 'Here is our availabilty: '
-			});
-
-			self.addAnswer({
-				type: 'availability',
-				dates: available
-			});
-
-			self.addAnswer({
-				type: 'prompt',
-				text: 'Would you like to book a ' + params.roomType + '?',
-				equiv: 'I would like to book a single.'
-			});
-
-			self.emit("respond", self.popUnsent());
-		});
-	});
-
-	this.ai.on('location', (params) => {
-		HotelInfo.getInfo(1098, 'position', function (err, pos) {
-			self.addAnswer({
-				type: "msg",
-				text: "Our address is 1 Jenkin Street"
-			});
-
-			self.addAnswer({
-				type: "location",
-				location: {
-					lat: parseFloat(pos.latitude),
-					lng: parseFloat(pos.longitude)
+					// Parse the dates
+					entities = self.parseDates(entities);
 				}
+
+				console.log("known: ", self.knownEntities);
+
+				// Merge the normalized entities with the knownEntities ones
+				entities = _.extend(entities || {}, self.knownEntities || {});
+
+
+				self.actions.merge(text, context, entities, cb);
 			});
 
-			self.emit("respond", self.popUnsent());
-		});
-	});
-
-	this.ai.on('directions', (params) => {
-		console.log("got to directions");
-
-		self.addAnswer({
-			type: 'directions',
-			origin: "JFK Airport",
-			dest: {
-                lat: 37.8386741,
-                lng: -122.2936934
-            }
-		});
-
-		self.emit("respond", self.popUnsent());
-	});
-
-	this.ai.on('rooms-info', (params) => {
-		RoomAmenities.getRooms(1098, params.roomAmenities, function (err, rooms) {
-			console.log(params);
-
-			if (rooms.length == 0) {
-				self.addAnswer({
-					type: "msg",
-					text: "Unfortunately, we don't have any rooms with " + params.roomAmenities + "."
-				})
-			} else {
-				self.addAnswer({
-					type: "msg",
-					text: "Only, some of our rooms have " + params.roomAmenities + ": "
-				});
-
-				self.addAnswer({
-					type: "rooms",
-					rooms: rooms
-				});
-			}
-
-			self.addAnswer({
-				type: 'prompt',
-				text: 'Would you like to book a room?',
-				equiv: 'I would like to book a room.'
-			});
-
-			self.emit("respond", self.popUnsent());
-		});
-	});
-
-	this.ai.on('hotel-info', (params) => {
-		HotelInfo.getInfo(1098, params.info, function (err, value) {
-			var response = { type: "msg" };
-
-			if (params.info == "phone") {
-				response.text = "Our phone number is " + value;
-			} else if (params.info == "fax") {
-				response.text = "Our fax is " + value;
-			} else if (params.info == "checkIn") {
-				response.text = "Check in time is " + value;
-			} else if (params.info == "checkOut") {
-				response.text = "Check out time is " + value;
-			}
-
-			self.addAnswer(response);
-			self.emit("respond", self.popUnsent());
-		});
-	});
-
-	this.ai.on('call', (params) => {
-		self.addAnswer({
-			type: "msg",
-			text: "Calling the hotel..."
-		});
-
-		self.emit("respond", self.popUnsent());
-	});
-
-	this.ai.on('text', (params) => {
-		if (params['confirm'] == 'yes') {
-			self.addAnswer({
-				type: "msg",
-				text: "Text sent successfully."
-			});
 		} else {
-			self.addAnswer({
-				type: "msg",
-				text: "Ok, I will not text the hotel."
-			});
+			self.ai.action(action, self.actions[action]);
 		}
-
-		self.emit("respond", self.popUnsent());
 	});
 };
 
-ChatBot.prototype.analyze = function (message, cb) {
-	async.parallel([
+ChatBot.prototype.analyze = function (message) {
+
+	return Promise.all([
+		WatsonAPI.sentiment(message),
+		WatsonAPI.identifyLang(message),
+		BingAPI.spellcheck(message),
+		WatsonAPI.emotions(message)
+	]).then(function (values) {
+		console.log("analyzing", values);
+
+		return {
+			lang: values[0].language,
+			sentiment: values[0].docSentiment,
+			langAcronym: values[1],
+			spellingErrs: values[2],
+			emotions: values[3]
+		};
+	});
+
+	/*async.parallel([
 		WatsonAPI.sentiment.bind(WatsonAPI, message),
 		WatsonAPI.identifyLang.bind(WatsonAPI, message),
 		BingAPI.spellcheck.bind(BingAPI, message),
@@ -285,37 +169,44 @@ ChatBot.prototype.analyze = function (message, cb) {
 		};
 
 		cb(err, analysis);
-	});
+	});*/
 };
 
-ChatBot.prototype.respond = function (message, cb) {
-	this.analyze(message, function (err, analysis) {
+ChatBot.prototype.respond = function (message, knownEntities, cb) {
+	var self = this;
+
+	this.analyze(message).then(function (analysis) {
 		var response = { analysis: analysis };
 
-		if (analysis.lang != 'english') {
+		/*if (analysis.lang != 'english') {
 			WatsonAPI.translateEn(
 				"My " + analysis.lang + " is not that good, could you repeat that in English?",
 				analysis.langAcronym,
 				function (err, translation) {
 					console.log("translation");
-					this.addMessage({
+					self.addMessage({
 						type: "msg",
 						text: translation
 					});
 
-					response.answers = this.popUnsent();
+					response.answers = self.popUnsent();
 					cb(response);
-				}.bind(this)
+				}.bind(self)
 			);
-		} else {
-			this.once("respond", function (answers) {
+		} else {*/
+			self.text = message;
+			self.knownEntities = knownEntities;
+
+			self.once("respond", function (answers) {
 				response.answers = answers;
 				cb(response);
 			});
 
-			this.ai.query(message);
-		}
-	}.bind(this));
+			console.log("known early: ", self.knownEntities);
+
+			self.ai.query(message);
+		// }
+	});
 };
 
 module.exports = ChatBot;
