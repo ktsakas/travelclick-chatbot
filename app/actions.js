@@ -5,6 +5,10 @@ const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 
 var Promise = require('bluebird');
 
+function changeIntent () {
+
+}
+
 module.exports = function (chat) {
 	var parsers = new Parsers(chat);
 
