@@ -3,97 +3,118 @@ const config = require('../../app/config.js'),
 	  uuid = require('node-uuid'),
 	  EventEmitter = require('events').EventEmitter,
 	  util = require('util'),
-	  request = require('request'),
+	  request = require('request-promise'),
 	  _ = require('underscore'),
 	  moment = require('moment');
 
 /**
- * API wrapper class for Wit.ai.
- * 
- * @constructor
- * @param {[type]}
+ * @class     WitAPI
+ * @classdesc API wrapper class for Wit.ai.
  */
-function WitAPI (token) {
-	var version = '20160706';
+class WitAPI extends EventEmitter {
+	constructor (token) {
+		super();
 
-	this.queryData = {
-		v: version,
-		session_id: uuid.v1()
-	};
+		var version = '20160706';
 
-	this.req = request.defaults({
-		baseUrl: 'https://api.wit.ai',
-		headers: {
-			'Authorization': 'Bearer ' + token,
-			'Accept': 'application/json',
-			'Content-Type': 'application/json'
-		}
-	});
+		this.queryData = {
+			v: version,
+			session_id: uuid.v1()
+		};
 
-	this.context = {};
+		this.req = request.defaults({
+			baseUrl: 'https://api.wit.ai',
+			headers: {
+				'Authorization': 'Bearer ' + token,
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			}
+		});
 
-	// this.actions = actions;
-	this.actions = {};
+		this.context = {};
 
-	return this;
+		// this.actions = actions;
+		this.actions = {};
+	}
+
+	/**
+	 * Set the action that will be called for a particular Wit action.
+	 * 
+	 * @param  {String} action - the name of the action
+	 * @param  {Function} fn - to be called for the action
+	 */
+	action (action, fn) {
+		this.actions[action] = fn;
+	}
+
+	/**
+	 * Will call an action with the given parameters.
+	 *
+	 * @private
+	 * @param  {String} action - name of the action to be called
+	 */
+	callAction(action) {
+		if (!this.actions[action]) throw "Action " + action + " does not exist!";
+
+		var restArgs = Array.prototype.slice.call(arguments, [1]);
+		// console.log("rest args: ", restArgs);
+		this.actions[action].apply(this, restArgs);
+	}
+
+	/**
+	 * Sends a query to Wit.ai with the given text
+	 * and based on the response calls the appropriate actions.
+	 *
+	 * @param  {String}  text input by the user to send to Wit
+	 * @return {Promise}
+	 */
+	query (text) {
+		var self = this;
+
+		l.info("querying with: ", self.context, text);
+		this.req.post({
+			url: "/converse",
+			qs: Object.assign(text ? { q: text } : {}, this.queryData),
+			body: self.context,
+			json: true
+		}).catch(
+			(err) => l.error(" -- wit query -- ", err)
+		).then(function (body) {
+			 if (body.type == "merge") {
+			 	l.info("MERGING");
+				// l.info("merge body: ", body);
+				self.callAction('merge', text, self.context, body.entities || {}, function (mergedCtx) {
+					self.context = mergedCtx;
+
+					self.query();
+				});
+			} else if (body.type == "msg") {
+			 	l.info("SAYING", body);
+				self.callAction('say', body);
+				self.query();
+			} else if (body.type == "action") {
+				self.callAction(body.action, self.context, function (newCtx) {
+					self.context = newCtx;
+
+					// l.info("action ctx: ", self.context);
+					self.query();
+				});
+			} else if (body.type == "stop") {
+			 	l.info("STOPPING");
+				l.info(self.context);
+				self.callAction('stop');
+				return;
+			}
+		});
+	}
+
+	/**
+	 * Reset the session id for wit.
+	 * This should be called when then intent changes.
+	 */
+	reset () {
+		this.queryData.session_id = uuid.v1();
+	}
 }
-
-util.inherits(WitAPI, EventEmitter);
-
-WitAPI.prototype.action = function (action, fn) {
-	this.actions[action] = fn;
-};
-
-WitAPI.prototype.callAction = function (action, args, cb) {
-	if (!this.actions[action]) throw "Action " + action + " does not exist!";
-
-	var restArgs = Array.prototype.slice.call(arguments, [1]);
-	// console.log("rest args: ", restArgs);
-	this.actions[action].apply(this, restArgs);
-};
-
-WitAPI.prototype.query = function (text) {
-	var self = this;
-
-	console.log("querying with: ", self.context, text);
-	this.req.post({
-		url: "/converse",
-		qs: _.defaults(text ? { q: text } : {}, this.queryData),
-		body: JSON.stringify(self.context)
-	}, function (err, res, body) {
-		body = JSON.parse(body);
-		console.log(body);
-
-		 if (body.type == "merge") {
-		 	console.log("MERGING");
-			// console.log("merge body: ", body);
-			self.callAction('merge', text, self.context, body.entities || {}, function (mergedCtx) {
-				self.context = mergedCtx;
-
-				self.query();
-			});
-		} else if (body.type == "msg") {
-		 	console.log("SAYING", body);
-			self.callAction('say', body);
-			self.query();
-		} else if (body.type == "action") {
-			self.callAction(body.action, self.context, function (newCtx) {
-				self.context = newCtx;
-
-				// console.log("action ctx: ", self.context);
-				self.query();
-			});
-		} else if (body.type == "stop") {
-		 	console.log("STOPPING");
-			console.log(self.context);
-			self.callAction('stop');
-			return;
-		}
-	});
-};
-
-WitAPI.prototype.reset = function (text) {
-	this.queryData.session_id = uuid.v1();
-};
 
 module.exports = WitAPI;

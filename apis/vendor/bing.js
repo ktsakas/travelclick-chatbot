@@ -2,6 +2,12 @@ const config = require('../../app/config.js');
 	  request = require('request-promise'),
 	  l = config.logger;
 
+/**
+ * All methods are static, do not call the constructor.
+ * 
+ * @class     BingAPI
+ * @classdesc Bing API wrapper.
+ */
 class BingAPI {
 	/**
 	 * Given a string it does spellchecking on it and returns
@@ -13,13 +19,15 @@ class BingAPI {
 	static spellcheck(text) {
 		return request.post({
 				url: config.bing.base_url + '/spellcheck?mode=spell',
-				'Ocp-Apim-Subscription-Key': config.bing.subscription_key,
+				headers: {
+					'Ocp-Apim-Subscription-Key': config.bing.subscription_key,
+				},
 				form: { text: text },
 				json: true
-			}).then(function (body) {
+			}).catch(
+				(err) => l.error(" -- spellcheck -- ", err)
+			).then(function (body) {
 				return body.flaggedTokens;
-			}).catch(function (err) {
-				l.error(err);
 			});
 	}
 };

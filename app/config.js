@@ -1,9 +1,16 @@
-const dotenv = require('dotenv').config({ path: __dirname + "/../.env" });
-var winston = require('winston');
+if (!process.env.PROD) {
+	const dotenv = require('dotenv').config({ path: __dirname + "/../.env" });
+}
+var winston = require('winston'),
+	logger = new (winston.Logger)({
+		transports: [
+			new (winston.transports.Console)({ level : 'silly', prettyPrint: true })
+		]
+	});
 
 module.exports = {
 	port: process.env.PORT || 3000,
-	logger: new (winston.Logger)({ level: 'silly' }),
+	logger: logger,
 
 	bing: {
 		base_url: "https://bingapis.azure-api.net/api/v5",
@@ -34,7 +41,7 @@ module.exports = {
 			api_key: process.env.WATSON_ALCHEMY_LANGUAGE_API_KEY
 		},
 
-		language_translation: {
+		language_translator: {
 			username: process.env.WATSON_LANG_TRANSLATION_USER,
 			password: process.env.WATSON_LANG_TRANSLATION_PASS,
 			version: "v2"

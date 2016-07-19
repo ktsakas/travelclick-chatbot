@@ -16,15 +16,15 @@ const moment = require('moment');
 l.level = 'silly';
 
 // Import our API wrappers and libraries
-const WatsonAPI = require('../apis/vendor/watson.js'),
-	  BingAPI = require('../apis/vendor/bing.js'),
-	  TwilioAPI = require('../apis/vendor/twilio.js'),
-	  AIAPI = require('../apis/vendor/api_ai.js');
+const WatsonAPI = require('../apis/vendor/watson'),
+	  BingAPI = require('../apis/vendor/bing'),
+	  TwilioAPI = require('../apis/vendor/twilio'),
+	  AIAPI = require('../apis/vendor/api_ai');
 
 
-const RoomAmenities = require('./room-amenities.js'),
-	  HotelInfo = require('./hotel-info.js'),
-	  Availability = require('./availability.js');
+const RoomAmenities = require('./room-amenities'),
+	  HotelInfo = require('./hotel-info'),
+	  Availability = require('./availability');
 
 
 function ChatBot () {

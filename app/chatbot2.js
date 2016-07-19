@@ -134,8 +134,26 @@ ChatBot.prototype.setupActions = function () {
 	});
 };
 
-ChatBot.prototype.analyze = function (message, cb) {
-	async.parallel([
+ChatBot.prototype.analyze = function (message) {
+
+	return Promise.all([
+		WatsonAPI.sentiment(message),
+		WatsonAPI.identifyLang(message),
+		BingAPI.spellcheck(message),
+		WatsonAPI.emotions(message)
+	]).then(function (values) {
+		console.log("analyzing", values);
+
+		return {
+			lang: values[0].language,
+			sentiment: values[0].docSentiment,
+			langAcronym: values[1],
+			spellingErrs: values[2],
+			emotions: values[3]
+		};
+	});
+
+	/*async.parallel([
 		WatsonAPI.sentiment.bind(WatsonAPI, message),
 		WatsonAPI.identifyLang.bind(WatsonAPI, message),
 		BingAPI.spellcheck.bind(BingAPI, message),
@@ -150,13 +168,13 @@ ChatBot.prototype.analyze = function (message, cb) {
 		};
 
 		cb(err, analysis);
-	});
+	});*/
 };
 
 ChatBot.prototype.respond = function (message, knownEntities, cb) {
 	var self = this;
 
-	this.analyze(message, function (err, analysis) {
+	this.analyze(message).then(function (analysis) {
 		var response = { analysis: analysis };
 
 		/*if (analysis.lang != 'english') {
