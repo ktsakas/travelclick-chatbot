@@ -2,10 +2,7 @@ const config = require('../../app/config.js'),
 	  l = config.logger,
 	  uuid = require('node-uuid'),
 	  EventEmitter = require('events').EventEmitter,
-	  util = require('util'),
-	  request = require('request-promise'),
-	  _ = require('underscore'),
-	  moment = require('moment');
+	  request = require('request-promise');
 
 /**
  * @class     WitAPI

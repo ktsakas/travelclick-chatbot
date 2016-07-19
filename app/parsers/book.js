@@ -1,7 +1,7 @@
 const moment = require("moment"),
 	  dateFormat = "YYYY-MM-DD";
 
-var Hotel = require('../apis/travelclick/travelclick.js'),
+var Hotel = require('../../apis/travelclick/travelclick.js'),
 	Promise = require("bluebird");
 
 

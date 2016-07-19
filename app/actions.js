@@ -8,15 +8,6 @@ var Promise = require('bluebird');
 module.exports = function (chat) {
 	var parsers = new Parsers(chat);
 
-	/*var intents = ['book', 'availability', 'directions', 'hotelInfo'];
-	function isInSomeFlow (context) {
-		for (var i = 0; i < intents.length; i++) {
-			if (context[intents[i]]) return true;
-		}
-
-		return false;
-	}*/
-
 	var actions = {
 		say: function (entities) {
 			chat.addMessage(entities.msg);
@@ -38,7 +29,7 @@ module.exports = function (chat) {
 			if (context.book) {
 				p = parsers.book(text, context, entities);
 			} else if (context.availability) {
-				p = Promise.resolve( parsers.availability(text, context, entities) );
+				p = parsers.availability(text, context, entities);
 			} else if (context.directions) {
 				p = Promise.resolve( parsers.directions(text, context, entities) );
 			} else if (context.hotelInfo) {
@@ -247,16 +238,16 @@ module.exports = function (chat) {
 		},
 
 		hotelInfo: function (context, cb) {
-			HotelInfo.getInfo(1098, context.hotelInfo, function (err, value) {
+			HotelInfo.getInfo(1098, context.hotelInfoName, function (err, value) {
 				var response = { type: "msg" };
 
-				if (context.hotelInfo == "phone") {
+				if (context.hotelInfoName == "phone") {
 					response.text = "Our phone number is " + value;
-				} else if (context.hotelInfo == "fax") {
+				} else if (context.hotelInfoName == "fax") {
 					response.text = "Our fax is " + value;
-				} else if (context.hotelInfo == "checkIn") {
+				} else if (context.hotelInfoName == "checkIn") {
 					response.text = "Check in time is " + value;
-				} else if (context.hotelInfo == "checkOut") {
+				} else if (context.hotelInfoName == "checkOut") {
 					response.text = "Check out time is " + value;
 				}
 
