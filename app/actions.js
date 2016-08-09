@@ -5,8 +5,14 @@ const RoomAmenities = require('../apis/travelclick/room-amenities.js'),
 
 var Promise = require('bluebird');
 
-function changeIntent () {
+function clearAllIntents (context) {
+	var intents = ['book', 'availability', 'directions', 'hotelInfo', 'roomInfo', 'text'];
 
+	intents.forEach(function (intent) {
+		if (context[intent]) delete context[intent];
+	});
+
+	return context;
 }
 
 module.exports = function (chat) {
@@ -23,6 +29,8 @@ module.exports = function (chat) {
 			console.log('merging: ', text, entities, context);
 
 			if (entities.intent && !context[entities.intent]) {
+				clearAllIntents(context);
+
 				context[entities.intent] = true;
 				delete entities.intent;
 
