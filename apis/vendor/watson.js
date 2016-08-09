@@ -1,10 +1,12 @@
+"use strict";
+
 const config = require('../../app/config.js'),
 	  l = config.logger,
-	  Promise = require('bluebird'),
-	  watson = require('watson-developer-cloud'),
-	  alchemy_language = watson.alchemy_language(config.watson.alchemy_language),
-	  language_translator = watson.language_translator(config.watson.language_translator),
-	  tone_analyzer = watson.tone_analyzer(config.watson.tone_analyzer);
+	  Promise = require('bluebird');
+	  // watson = require('watson-developer-cloud'),
+	  // alchemy_language = watson.alchemy_language(config.watson.alchemy_language),
+	  // language_translator = watson.language_translator(config.watson.language_translator),
+	  // tone_analyzer = watson.tone_analyzer(config.watson.tone_analyzer);
 
 
 /**
@@ -22,7 +24,7 @@ class WatsonAPI {
 	 * @return {promise} Promise that resovles to object with sentiment and language.
 	 */
 	static sentiment(text) {
-		return Promise.promisify(alchemy_language.sentiment, {
+		/*return Promise.promisify(alchemy_language.sentiment, {
 			context: alchemy_language
 		})({
 			text: text
@@ -35,6 +37,11 @@ class WatsonAPI {
 				langugage: res.language,
 				docSentiment: res.docSentiment
 			};
+		});*/
+
+		return Promise.resolve({
+			language: null,
+			docSentiment: null
 		});
 	}
 
@@ -45,7 +52,7 @@ class WatsonAPI {
 	 * @return {promise} Promise that resolves to a string with the language identified.
 	 */
 	static identifyLang(text) {
-		return Promise.promisify(language_translator.identify, {
+		/*return Promise.promisify(language_translator.identify, {
 			context: language_translator
 		})({
 			text: text
@@ -53,7 +60,9 @@ class WatsonAPI {
 			(err) => l.error(" -- identifyLang -- ", err)
 		).then(
 			(res) => res.languages[0].language
-		);
+		);*/
+
+		return Promise.resolve("en");
 	}
 
 	/**
@@ -64,7 +73,7 @@ class WatsonAPI {
 	 * @return {promise} Promise that resolves to a string with the language identified.
 	 */
 	static translateEn(text, to) {
-		return Promise.promisify(language_translator.translate, {
+		/*return Promise.promisify(language_translator.translate, {
 			context: language_translator
 		})({
 			text: text, source: 'en', target: to
@@ -75,7 +84,9 @@ class WatsonAPI {
 			// If the language is supported
 			if (res) return res.translations[0].translation;
 			else     return null;
-		});
+		});*/
+
+		return Promise.resolve(null);
 	}
 
 	/**
@@ -85,7 +96,7 @@ class WatsonAPI {
 	 * @return {promise} Promise that resolves to object with emotions.
 	 */
 	static emotions(text) {
-		return Promise.promisify(tone_analyzer.tone, {
+		/*return Promise.promisify(tone_analyzer.tone, {
 			context: tone_analyzer
 		})({
 			text: text
@@ -93,7 +104,9 @@ class WatsonAPI {
 			(err) => l.error(" -- emotions -- ", err)
 		).then(
 			(res) => res.document_tone.tone_categories[0].tones
-		);
+		);*/
+
+		return Promise.resolve({});
 	}
 };
 
