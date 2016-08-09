@@ -9,6 +9,7 @@ var parsers = {
 	hotelInfo: require('./parsers/hotelInfo'),
 	directions: require('./parsers/directions'),
 	roomInfo: require('./parsers/roomInfo'),
+	text: require('./parsers/text'),
 };
 
 module.exports = function (chat) {

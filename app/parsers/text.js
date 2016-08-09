@@ -1,9 +1,9 @@
 function getMessage (text, textCommand) {
-	var commandStart = text.indexOf(entities.textCommand);
+	var commandStart = text.indexOf(textCommand);
 
 	if (commandStart == -1) return null;
 	else {
-		var messageStart = commandStart + entities.textCommand.length;
+		var messageStart = commandStart + textCommand.length;
 		var message = text.substring(messageStart).trim();
 
 		if (message.length <= 8) return null;

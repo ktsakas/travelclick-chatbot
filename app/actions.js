@@ -31,6 +31,8 @@ module.exports = function (chat) {
 
 			var p;
 			if (context.book) {
+				console.log("BOOK");
+
 				p = parsers.book(text, context, entities);
 			} else if (context.availability) {
 				p = parsers.availability(text, context, entities);

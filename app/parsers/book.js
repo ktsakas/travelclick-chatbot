@@ -316,7 +316,8 @@ module.exports = function (text, ctx, entities) {
 
 	// If this is a new command
 	// or no rooms matching the query where found
-	if (entities.newCommand || ctx.noRooms) {
+	if (entities.newCommand || ctx.noRooms || entities.yes) {
+		console.log("NEW COMMAND");
 
 		if (entities.dates) {
 			p = p.then((ctx) => parseDates(ctx, entities));
@@ -326,6 +327,7 @@ module.exports = function (text, ctx, entities) {
 
 	// Note: this will also run if some argument is invalid (errorMsg state)
 	} else {
+		console.log("OLD COMMAND");
 
 		// Parse one missing argument at a time
 		if      (!ctx.dateIn) p = p.then((ctx) => parseDates(ctx, entities));

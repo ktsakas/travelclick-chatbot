@@ -12,6 +12,8 @@ app.controller("calendarCtrl", function ($scope, $element) {
 			bound: false,
 			container: $element[0].getElementsByClassName('calendar')[0],
 			onDraw: function () {
+				console.log("answer type: ", $scope.answer.type)
+
 				if ($scope.answer.type == 'availability') {
 					var date = $scope.answer.dates;
 
@@ -23,9 +25,9 @@ app.controller("calendarCtrl", function ($scope, $element) {
 							monthDay = parseInt(date[2]);
 
 						console.log(date, year, month, monthDay);
-						console.log("button[data-pika-day=" + monthDay + "]"
+						console.log($element.find("button[data-pika-day=" + monthDay + "]"
 							+ "[data-pika-month=" + month + "]"
-							+ "[data-pika-year=" + year + "]");
+							+ "[data-pika-year=" + year + "]"));
 
 						$element.find("button[data-pika-day=" + monthDay + "]"
 							+ "[data-pika-month=" + month + "]"
