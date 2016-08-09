@@ -1,3 +1,5 @@
+"use strict";
+
 const EventEmitter = require('events').EventEmitter,
 	  util = require('util'),
 	  _ = require('underscore');

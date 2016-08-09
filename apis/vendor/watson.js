@@ -1,3 +1,5 @@
+"use strict";
+
 const config = require('../../app/config.js'),
 	  l = config.logger,
 	  Promise = require('bluebird'),

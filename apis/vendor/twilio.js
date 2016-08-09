@@ -1,3 +1,5 @@
+"use strict";
+
 const config = require("../../app/config"),
 	  l = config.logger;	  
 

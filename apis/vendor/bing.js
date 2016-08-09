@@ -1,4 +1,6 @@
-const config = require('../../app/config.js');
+"use strict";
+
+const config = require('../../app/config.js'),
 	  request = require('request-promise'),
 	  l = config.logger;
 
