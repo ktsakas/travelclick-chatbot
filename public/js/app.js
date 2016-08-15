@@ -1,6 +1,10 @@
 var app = angular.module("chatbot", [/*'jsonFormatter'*/]);
 var sessionId = Math.floor(Math.random() * 1000000) + 1;
 
+app.component("message", { templateUrl: "/partials/message.html" });
+app.component("yes-no", { templateUrl: "/partials/yes-no.html" });
+app.component("help", { templateUrl: "/partials/help.html" });
+
 app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 	// Array of all answers (bot and user)
 	$scope.answers = [];
@@ -125,7 +129,3 @@ app.filter('unsafe', function($sce) {
         return $sce.trustAsHtml(val);
     };
 });
-
-app.controller("message", { templateUrl: "/partials/message.html" });
-app.controller("yes-no", { templateUrl: "/partials/yes-no.html" });
-app.controller("help", { templateUrl: "/partials/help.html" });

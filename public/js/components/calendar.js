@@ -1,5 +1,5 @@
 app.controller("calendarCtrl", {
-	templateUrl: "partials/calendar.html"
+	templateUrl: "partials/calendar.html",
 	controller: function ($scope, $element) {
 		var dateIn = null,
 			dateOut = null;
@@ -92,4 +92,4 @@ app.controller("calendarCtrl", {
 
 		$scope.init();
 	}
-);
+});
