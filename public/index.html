@@ -1,156 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>TravelClick ChatBot</title>
-        <link rel="stylesheet/less" type="text/css" href="css/styles.less">
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,400italic' rel='stylesheet' type='text/css' />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.css" rel="stylesheet" type="text/css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/css/pikaday.min.css" rel="stylesheet" type="text/css" />
-    </head>
-    <body ng-app="chatbot" ng-controller="chatCtrl">
-        
-       
+<head>
+	<title>Booking assistant</title>
 
-    	<div id="header">
-    	<div class="center">
-    		TravelClick Chatbot Assistant
+	<link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic' rel='stylesheet' type='text/css'>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/css/pikaday.min.css" rel="stylesheet" type="text/css" />
+	
+	<link rel="stylesheet/less" type="text/css" href="css/styles.less" />
+	<link rel="stylesheet/less" type="text/css" href="css/calendar.less" />
+	<link rel="stylesheet/less" type="text/css" href="css/directions.less" />
+</head>
+<body ng-app="chatbot" ng-controller="chatCtrl">
+	
+	<!-- Topbar -->
+	<div id="topbar">
+		<div class="center">
+			TravelClick ChatBot Assistant
 
-    		<div class="comment">Book a hotel, ask for room information, directions or directly contact the hotel.</div>
-    	</div>
-    	</div>
-
-    	<div class="center">
-    		<ul id="chat">
-    		  <li class="bot msg">
-                Hey, I am a chatbot. <br />
-                Let me know if you need help with any of the following:
-                    <ul>
-                        <li>
-                            <a ng-click="sendMessage('I want to book a room.')">
-                                Booking a room
-                            </a>
-                        </li>
-                        <li>
-                            <a ng-click="sendMessage('What is your phone number?')">
-                                Ask information about the hotel and our rooms
-                            </a>
-                        </li>
-                        <li>
-                            <a ng-click="sendMessage('What is your availability in July?')">
-                                Ask about availability
-                            </a>
-                        </li>
-                        <li>
-                            <a ng-click="sendMessage('How do I get there from Boston?')">
-                                Get our address or directions
-                            </a>
-                        </li>
-                        <li>
-                            <a ng-click="sendMessage('Call the hotel.')">
-                                Contact the hotel
-                            </a>
-                        </li>
-                    </ul>
-              </li>
-
-    		  <li ng-controller="msgCtrl" ng-repeat="msg in messages" class="{{msg.owner}} {{msg.type}}">
-                <span ng-click="msg.showAnalysis = !msg.showAnalysis" ng-show="msg.type == 'msg' || msg.type == 'prompt'">
-                    {{msg.text}}
-                </span>
-
-                <!-- <button>Yes</button><button>No</button> -->
-
-                <json-formatter ng-show="msg.owner == 'user' && msg.showAnalysis" json="msg.analysis" open="5"></json-formatter>
-
-                <span ng-show="msg.type == 'setRoomType'">
-                <ul>
-                    <li ng-repeat="room in msg.rooms track by $index">
-                        <img ng-src="{{room.picture}}" /><br />
-
-                        {{room.roomTypeName}}<br />
-
-                        <button ng-click="setRoomType(room.roomCode, room.roomTypeName)">
-                            Choose
-                        </button>
-                    </li>
-                </ul>
-                </span>
-
-                <div class="map" ng-show="msg.type == 'location' || msg.type == 'directions'"></div>
-
-                <div ng-show="msg.type == 'availability'" class="calendar">
-                    <a class="previous">&#x2039;</a>
-                    <table cellspacing="0">
-                    <thead>
-                        <tr>
-                            <td>Sun</td>
-                            <td>Mon</td>
-                            <td>Tue</td>
-                            <td>Wed</td>
-                            <td>Th</td>
-                            <td>Fri</td>
-                            <td>Sat</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="dayRange in dayRanges track by $index">
-                            <!-- <td>{{dayRange}}</td> -->
-                            <td ng-repeat="day in dayRange track by $index" class="{{day.class}}">{{day.num}}</td>
-                        </tr>
-                    </tbody>
-                    </table>
-                    <a class="next">&#x203A;</a>
-                </div>
-                
-                <ul ng-show="msg.type == 'rooms'" class="rooms">
-                    <li ng-repeat="room in msg.rooms">
-                        <div  ng-click="msg.selectable && sendMessage('The &quot;' + room.roomTypeName + '&quot;', room);">
-                            <div class="roomName"><span>{{room.roomTypeName}}</span></div>
-                            <img src="http://placehold.it/180x120" />
-                            <div>for {{room.maxOccupancy}} people</div>
-                        </div>
-                        
-                        <button class="availButton" ng-show="msg.availButton" ng-click="sendMessage('Show me your availability for the &quot;' + room.roomTypeName + '&quot;', room)">
-                            Availability
-                        </button>
-                        <button class="bookButton" ng-show="msg.bookButton"  ng-click="sendMessage('Book me the &quot;' + room.roomTypeName + '&quot; room', room)">
-                            Book
-                        </button>
-                    </li>
-                </ul>
-
-                <div ng-show="msg.type == 'directions-steps'" class="steps">
-                    <div ng-repeat="step in msg.steps">
-                        <span style="position: relative; margin-right: 19px;"><i class="adp-maneuver adp-{{step.maneuver}}"></i></span>
-                        <span ng-bind-html="step.instructions | unsafe"></span>
-                    </div>
-                </div>
-
-                <span ng-show="msg.type == 'setDates'">
-                [IMAGINARY CALENDAR] <br />
-
-                <button ng-click="setDates()">Choose February 2nd to February 5th for now</button>
-                </span>
-              </li>
-            </ul>
-            
-    	</div>
+			<a href="https://github.com/ktsakas/travelclick-chatbot"><i class="github icon"></i></a>
+		</div>
+	</div>	
 
 
-    	<div class="center">
-        <form ng-submit="addMessage(this)">
-    	   <input type="text" ng-model="newMessage" ng-disabled="disabled" id="new-message" placeholder="Send a message..." />
-        </form>
-    	</div>
+	<div class="center">
+		<!-- List of chat messages -->
+		<ul id="chat">
+			<li class="{{answer.owner}}" ng-controller="answerCtrl" ng-repeat="answer in answers">
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-    	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/json-formatter/0.6.0/json-formatter.min.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk">
-        </script>
-        <script src="js/api-ai/target/api.ai.min.js"></script>
+				<message ng-if="answer.type == 'msg'"></message>
 
-        <script src="js/app.js"></script>
-    </body>
+				<!-- Bot only answers -->
+				<yesNo ng-if="answer.type == 'yes_no'"></yesNo>
+				
+				<roomsList ng-if="answer.type == 'rooms'"></roomsList>
+				
+				<calendar ng-if="answer.type == 'availability' || answer.type == 'calendar'"></calendar>
+				
+				<directions ng-if="answer.type == 'directions'"></directions>
+
+				<help ng-if="answer.type == 'help'"></help>
+			</li>
+
+			<!-- Fit height fix -->
+			<li style="clear: both;"></li>
+		</ul>
+		
+		<!-- Input to send message -->
+		<div id="footer">
+			<form class="ui action input" ng-submit="submitMessage(this)">
+				<input type="text" placeholder="Send a message..." ng-model="newMessage" />
+				<button class="ui icon button"><i class="send icon"></i></button>
+			</form>
+		</div>
+	</div>
+	
+
+	<!-- JQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+	<!-- Less.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
+	<!-- AngularJS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+	<!-- SemanticUI -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
+	<!-- Moment.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
+	<!-- Pickaday.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/pikaday.min.js"></script>
+	<!-- Google Maps -->
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbVQPyu3rG6eRovOO8PfXH5hHCktvtHyk"></script>
+	
+	<script src="js/app.js"></script>
+
+	<script src="js/components/calendar.js"></script>
+	<script src="js/components/directions.js"></script>
+	<script src="js/components/roomList.js"></script>
+
+</body>
 </html>

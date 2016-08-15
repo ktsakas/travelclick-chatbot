@@ -2,367 +2,154 @@
 @blue-dark: darken(@blue, 50%, relative);
 @blue-light: tint(fade(@blue, 40%), 40%);
 
-
-.adp-maneuver {
-	background-size: 19px 630px;
-	position: absolute;
-	left: 0;
-	width: 16px;
-	height: 16px;
-}
-
-.adp-maneuver.adp- {
-	background-position: 0 -534px
-}
-
-.adp-maneuver.adp-ferry {
-	background-position: 0 -614px
-}
-
-.adp-maneuver.adp-ferry-train {
-	background-position: 0 -566px
-}
-
-.adp-maneuver.adp-merge {
-	background-position: 0 -143px
-}
-
-.adp-maneuver.adp-straight {
-	background-position: 0 -534px
-}
-
-.adp-maneuver.adp-fork-left {
-	background-position: 0 -550px
-}
-
-.adp-maneuver.adp-ramp-left {
-	background-position: 0 -598px
-}
-
-.adp-maneuver.adp-roundabout-left {
-	background-position: 0 -197px
-}
-
-.adp-maneuver.adp-turn-left {
-	background-position: 0 -413px
-}
-
-.adp-maneuver.adp-turn-sharp-left {
-	background-position: 0 0
-}
-
-.adp-maneuver.adp-turn-slight-left {
-	background-position: 0 -378px
-}
-
-.adp-maneuver.adp-uturn-left {
-	background-position: 0 -305px
-}
-
-.adp-maneuver.adp-fork-right {
-	background-position: 0 -499px
-}
-
-.adp-maneuver.adp-ramp-right {
-	background-position: 0 -429px
-}
-
-.adp-maneuver.adp-roundabout-right {
-	background-position: 0 -232px
-}
-
-.adp-maneuver.adp-turn-right {
-	background-position: 0 -483px
-}
-
-.adp-maneuver.adp-turn-sharp-right {
-	background-position: 0 -582px
-}
-
-.adp-maneuver.adp-turn-slight-right {
-	background-position: 0 -51px
-}
-
-.adp-maneuver.adp-uturn-right {
-	background-position: 0 -35px
-}
-
-.adp-maneuver {
-	background-image: url(http://maps.gstatic.com/mapfiles/api-3/images/maneuvers.png);
-}
-
-
 body {
-	margin: 0px;
-	font-family: 'Open Sans', sans-serif;
-	// font-size: 16px;
-}
-
-ul {
-	list-style: none;
-	margin: 0px;
-	padding: 0px;
-
-	li {
-		padding: 0px;
-	}
+	font-family: 'Lato', sans-serif;
+	background-color: #EEE;
+	overflow: scroll;
 }
 
 a {
+	color: @blue-dark;
 	cursor: pointer;
 }
 
 a:hover {
 	text-decoration: underline;
-	color: #003b64;
 }
 
-#header {
-	background-color: @blue-dark;
-	color: white;
-	font-weight: bold;
-	font-size: 24px;
-	padding: 5px;
-
-	.comment {
-		font-weight: normal;
-		font-size: 14px;
-		font-style: italic;
-	}
-}
 
 .center {
-	width: 600px;
+	max-width: 700px;
 	margin: auto;
 }
 
-@keyframes msg-enter {
-	from { opacity: 0; }
-	to { }
+#topbar {
+	font-size: 17px;
+	line-height: 42px;
+	background-color: @blue-dark;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+
+	a {
+		float: right;
+		font-size: 32px;
+		color: white;
+	}
+
+	a:hover {
+		color: yellow;
+	}
 }
+
 
 #chat {
-	overflow: hidden;
-	padding-top: 20px;
+	padding: 0px 10px;
+	list-style: none;
 	margin-bottom: 100px;
-	
-	> li {
-		animation: msg-enter 0.5s;
-	}
-
-	.steps {
-		width: 500px;
-		font-size: 0.9em;
-
-		div {
-			padding: 5px 0px;
-		}
-	}
-
-	.rooms {
-		b {
-			font-weight: 400;
-		}
-
-		li {
-			display: inline-block;
-			float: left;
-			width: 180px;
-			margin-left: 10px;
-			margin-bottom: 10px;
-			border: 1px solid #CCC;
-			border-radius: 5px;
-
-			div {
-				width: 100%;
-				padding: 5px 0px;
-				text-align: center;
-			}
-
-			.roomName {
-				height: 3em;
-
-				span {
-					display: table-cell;
-					width: 180px;
-					height: 3em;
-					vertical-align: middle;
-				}
-			}
-		}
-
-		button {
-			width: 100%;
-			border: none;
-			padding: 10px 5px;
-			color: white;
-			background-color: #003b64;
-		}
-
-		.availButton {
-			background-color: #066400;
-		}
-
-		.bookButton {
-			background-color: #003b64;
-		}
-	}
-
-	.calendar {
-		display: inline-block;
-		position: relative;
-		padding-left: 40px;
-		padding-right: 40px;
-		margin-top: 5px;
-		margin-bottom: 10px;
-	
-		.empty {
-			color: white;
-		}
-
-		.avail {
-			background: rgb(195, 232, 146);
-		}
-
-		.booked {
-			background: #ffa7a7;
-		}
-	
-		.previous, .next {
-			position: absolute;
-			top: 0px;
-			bottom: 0px;
-			padding-top: 120px;
-
-			text-align: center;
-			width: 40px;
-			font-size: 24px;
-			border: 1px solid #AAA;
-		}
-
-		.previous {
-			left: 0px;
-			border-right: none;
-			border-top-left-radius: 5px;
-			border-bottom-left-radius: 5px;
-		}
-
-		.next {
-			right: 0px;
-			border-left: none;
-			border-top-right-radius: 5px;
-			border-bottom-right-radius: 5px;
-		}
-
-		table {
-			@border-color: #999;
-
-			border-left: 1px solid @border-color;
-			border-top: 1px solid @border-color;
-
-			td {
-				width: 50px;
-				text-align: center;
-				padding: 10px 0px;
-				border-right: 1px solid @border-color;
-				border-bottom: 1px solid @border-color;
-				margin: 0px;
-			}
-		}
-	}
-
-	.map {
-		height: 300px;
-		width: 500px;
-		border-radius: 5px;
-		float: right;
-	}
-
-	.bot, .user {
-		clear: both;
-	}
-	
-	.bot {
-		float: right;
-	}
 
 	.user {
+		@keyframes user-msg-enter {
+			from { margin-left: -100px; opacity: 0; }
+			to { opacity: 1; }
+		}
+
 		float: left;
-		margin: 20px 0px;
+		clear: both;
+		animation: user-msg-enter 1s;
 	}
 
-	.user:last-child {
-		margin-bottom: 0px;
-	}
-
-	.bot.msg,
-	.bot.prompt {
-		font-weight: 600;
-
-		ul {
-			margin-left: 50px;
-			list-style-type: circle;
+	.bot {
+		@keyframes bot-msg-enter {
+			from { margin-right: -100px; opacity: 0; }
+			to { opacity: 1; }
 		}
-	}
 
-	.bot.msg:before,
-	.bot.prompt:before {
-		font-family: "Times New Roman";
-  		content: "\201C";
-  		color: @blue-light;
-		font-size: 3em;
-		line-height: 0.1em;
-		vertical-align: -0.2em;
-		margin-right: 0.25em;
-	}
-
-	.bot.msg:after,
-	.bot.prompt:after {
-		font-family: "Times New Roman";
-  		content: "\201D";
-  		color: @blue-light;
-		font-size: 3em;
-		line-height: 0.1em;
-		margin-left: 0.25em;
-		margin-top: 0.6em;
 		float: right;
+		clear: both;
+		animation: bot-msg-enter 1s;
 	}
 
-	.bot.setRoomType {
-		li {
-			// float: right;
+	.msg {
+		color: black;
+		padding: 10px 15px;
+		background-color: white;
+		font-size: 16px;
+		margin: 5px 0px;
+		border-radius: 3px;
+		font-weight: normal;
+		box-shadow: none;
+	}
+
+	.msg.help {
+		list-style: none;
+		line-height: 1.8em;
+	
+		.tag {
+			color: grey;
 			display: inline-block;
-			padding: 5px;
-			border: 1px solid #CCC;
-			border-radius: 5px;
-			margin-left: 5px;
+			font-size: 14px;
+			width: 150px;
 		}
 	}
 
-	.user.msg {
-		font-weight: 600;
-		background-color: @blue-light;
-		border-radius: 20px 5px;
-		display: inline-block;
-		padding: 10px 20px;
+	/* YES/NO message choice */
+
+	@yes-green: rgba(49, 128, 0, 0.85);
+	@no-red: rgba(255, 0, 0, 0.80);
+
+	.bot .green.msg:hover {
+		background-color: @yes-green !important;
+	}
+
+	.bot .red.msg:hover {
+		background-color: @no-red !important;
+	}
+
+	.bot .rooms {
+		// text-align: center;
+	
+		.card {
+			max-width: 200px;
+			width: auto;
+			float: right;
+			margin: 10px;
+		}
+
+		.card.selectable {
+			cursor: pointer;
+		}
+
+		.card.selectable:hover {
+			background-color: rgba(0, 78, 255, 0.5);
+		}
 	}
 }
 
-#new-message {
-	box-sizing: border-box;
-	font-family: 'Open Sans', sans-serif;
-	font-size: 16px;
-	width: 600px;
-	font-weight: bold;
-	color: black;
-
-	border: 1px solid #AAA;
-	border-bottom: none;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-
+#footer {
 	position: fixed;
+	background-color: rgba(238, 238, 238, 0.6);
 	bottom: 0px;
-	padding: 10px 20px 50px 20px;
-	outline: none;
+	padding-bottom: 20px;
+	width: 100%;
+	max-width: inherit;
+
+	.input {
+		font-family: 'Lato', sans-serif;
+		font-size: 17px;
+		border: none;
+		padding: 10px 20px;
+		width: 100%;
+	}
+
+	.input:not([class*="left action"])>input {
+		border-radius: .28571429rem !important;
+		border-right-color: rgba(34,36,38,.15) !important;
+	}
+
+	button {
+		padding: 5px;
+		font-size: 32px;
+		background: none;
+	}
 }

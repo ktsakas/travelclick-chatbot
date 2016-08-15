@@ -1,0 +1,17 @@
+<form name="calendar" ng-controller="calendarCtrl" class="{{answer.type == 'calendar' ? 'temporary' : ''}}">
+	<input type="text" name="calendarField" style="display: none;" />
+
+	<div class="container">
+		<div class="calendar"></div>
+
+		<span ng-if="answer.type != 'availability'">
+			<div class="rangetip">from to</div>
+
+			<input type="button" ng-click="clearCalendar()" class="ui negative basic button" value="Clear" />
+			<input type="button" ng-click="selectDate()" class="ui primary button" value="Done" />
+		</span>
+	</div>
+
+	<div class="avail-color">&nbsp;</div> Available
+	<div class="booked-color">&nbsp;</div> Booked
+</form>

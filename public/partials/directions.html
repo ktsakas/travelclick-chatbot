@@ -1,0 +1,10 @@
+<div class="map"></div>
+
+<div class="msg directions">
+	<div class="step" ng-repeat="step in directions">
+		<span style="position: relative; margin-right: 19px;">
+			<i class="adp-maneuver adp-{{step.maneuver}}"></i>
+		</span>
+		<span ng-bind-html="step.instructions | unsafe"></span>
+	</div>
+</div>

@@ -17,13 +17,17 @@ Array.prototype.shuffle = function() {
 	return input;
 }
 
+function getRand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 var alwaysAmenities = [ "coffeemaker", "alarm", "air condition" ];
 var randAmenities = [
 	"wifi", "tv", "telephone", "bathtub", "bathroom", "kitchen", "ocean view"
 ];
 
 app.get('/check', function (req, res) {
-	res.json({ 'check': 'fine' });
+	res.json({ check: 'fine' });
 });
 
 app.get('/hotel/:hotelCode/avail', function (req, res) {
@@ -65,7 +69,7 @@ app.get('/hotel/:hotelCode/avail', function (req, res) {
 				isPremiumAmenity: false,
 				image: {
 					type: "icon",
-					source: "http://lorempixel.com/200/150/city/1/",
+					source: "images/room" + k + ".jpg",
 					sortOrder: 0
 				}
             });
@@ -186,7 +190,7 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 		hotelName: faker.company.companyName(),
 		mainImage: {
 			sortOrder: 0,
-			source: "http://lorempixel.com/1366/768/city/1/",
+			source: "images/room" + getRand(1, 10) + ".jpg",
 			type: "image"
 		},
 
@@ -215,7 +219,7 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 				isPremiumAmenity: true,
 				image: {
 					type: "photo",
-					source: "http://lorempixel.com/200/150/city/1/",
+					source: "images/room" + k + ".jpg",
 					sortOrder: 0
 				},
 				sortOrder: 0

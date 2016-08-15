@@ -1,0 +1,30 @@
+<div class="rooms" ng-controller="roomsCtrl">
+	<div class="ui fluid card {{answer.selectable ? 'selectable' : ''}}"
+		 ng-repeat="room in answer.rooms track by $index"
+		 ng-click="answer.selectable && sendMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+		<div class="content">
+			{{room.roomTypeName}}
+			<div class="meta">
+			<span class="date">for 3 people</span>
+			</div>
+		</div>
+
+		<img src="http://placehold.it/200x150" />
+		<!-- <img ng-src="{{room.picture}}" /> -->
+
+		<div class="content">
+			<div class="ui two buttons">
+				<button class="ui basic green button" ng-click="viewDetails()">Details</button>
+				<button ng-if="answer.bookButton" class="ui basic blue button"
+						ng-click="bookRoom($event, room);">
+					Book
+				</button>
+				<button ng-if="answer.availButton" class="ui basic blue button"
+						ng-click="sendMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+					Availability
+				</button>
+				<!--  ng-if="rooms.bookButton" -->
+			</div>
+		</div>
+	</div>
+</div>
