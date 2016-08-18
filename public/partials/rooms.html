@@ -1,7 +1,9 @@
-<div class="rooms" ng-controller="roomsCtrl">
+<div class="rooms">
+	{{$ctrl.rooms}}
+
 	<div class="ui fluid card {{answer.selectable ? 'selectable' : ''}}"
-		 ng-repeat="room in answer.rooms track by $index"
-		 ng-click="answer.selectable && sendMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+		 ng-repeat="room in $ctrl.rooms track by $index"
+		 ng-click="$ctrl.selectable && $ctrl.onUpdate({ text: 'The &quot;' + room.roomTypeName + '&quot; room.', room: room })">
 		<div class="content">
 			{{room.roomTypeName}}
 			<div class="meta">
@@ -20,7 +22,7 @@
 					Book
 				</button>
 				<button ng-if="answer.availButton" class="ui basic blue button"
-						ng-click="sendMessage('The &quot;' + room.roomTypeName + '&quot; room.', room)">
+						ng-click="$ctrl.onUpdate({ text: 'The &quot;' + room.roomTypeName + '&quot; room.', rom: room })">
 					Availability
 				</button>
 				<!--  ng-if="rooms.bookButton" -->

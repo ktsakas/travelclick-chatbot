@@ -1,5 +1,8 @@
 app.component("roomList", {
-	templateUrl: "/partials/roomList",
+	templateUrl: "/partials/rooms.html",
+	bindings: {
+		rooms: '<'
+	},
 	controller: function ($scope/*, $element*/, $http, $timeout) {
 		$scope.bookRoom = function (e, room) {
 			$scope.addMessage('Book me the "' + room.roomTypeName + '" room.', room);

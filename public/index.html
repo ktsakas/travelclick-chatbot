@@ -29,10 +29,14 @@
 		<ul id="chat">
 			<li class="{{answer.owner}}" ng-repeat="answer in answers">
 
-				<message ng-if="answer.type == 'msg'"></message>
+				<message
+					class="ui msg {{answer.owner == 'user' ? 'left' : 'right'}} pointing label"
+					ng-if="answer.type == 'msg'"
+					text="answer.text">
+				</message>
 
 				<!-- Bot only answers -->
-				<yesNo ng-if="answer.type == 'yes_no'"></yesNo>
+				<yesNo selectable="answer.selectable" rooms="answer.rooms" ng-if="answer.type == 'yes_no'"></yesNo>
 				
 				<roomsList ng-if="answer.type == 'rooms'"></roomsList>
 				
@@ -40,7 +44,7 @@
 				
 				<directions ng-if="answer.type == 'directions'"></directions>
 
-				<help ng-if="answer.type == 'help'"></help>
+				<help ng-if="answer.type == 'help'" on-select="sendMessage(text);"></help>
 			</li>
 
 			<!-- Fit height fix -->

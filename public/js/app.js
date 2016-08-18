@@ -1,9 +1,9 @@
 var app = angular.module("chatbot", [/*'jsonFormatter'*/]);
 var sessionId = Math.floor(Math.random() * 1000000) + 1;
 
-app.component("message", { templateUrl: "/partials/message.html" });
+app.component("message", { template: "{{ $ctrl.text }}", bindings: { text: '<' } });
 app.component("yes-no", { templateUrl: "/partials/yes-no.html" });
-app.component("help", { templateUrl: "/partials/help.html" });
+app.component("help", { templateUrl: "/partials/help.html", bindings: { onSelect: '&' } });
 
 app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 	// Array of all answers (bot and user)
@@ -46,6 +46,8 @@ app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {
 	};
 
 	$scope.sendMessage = function (newMsg, knownEntities) {
+		console.log("what");
+
 		var equiv = $scope.equiv;
 
 		$scope.answers.push({
