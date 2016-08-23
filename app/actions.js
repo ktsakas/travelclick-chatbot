@@ -13,10 +13,15 @@ module.exports = function (chat) {
 	var parsers = new Parsers(chat);
 
 	var actions = {
-		say: function (entities) {
-			chat.addMessage(entities.msg);
+		say: function (body) {
+			chat.addMessage(body.msg);
 
-			if (entities.quickreplies) chat.addAnswer({ type: 'yes_no' });
+			if (body.quickreplies) chat.addAnswer({ type: 'yes_no' });
+
+			/*delete context.askHelp;
+			delete context.unknown;
+
+			cb(context);*/
 		},
 
 		merge: function (text, context, entities, cb) {
@@ -45,6 +50,9 @@ module.exports = function (chat) {
 			} else if (context.text) {
 				console.log("PARSING TEXT");
 				p = Promise.resolve( parsers.text(text, context, entities) );
+			} else if (context.askHelp) {
+				delete context.askHelp;
+				p = Promise.resolve(context);
 			} else {
 				context.unknown = true;
 				p = Promise.resolve(context);
@@ -86,7 +94,6 @@ module.exports = function (chat) {
 
 		directions: function (context, cb) {
 			console.log("CALLING DIRECTIONS!\n");
-			context.askHelp = true;
 
 			chat.addAnswer({
 				type: 'directions',
@@ -97,6 +104,10 @@ module.exports = function (chat) {
 				}
 			});
 
+			delete context.directions;
+			delete context.fromLocation;
+
+			context.askHelp = true;
 			cb(context);
 		},
 

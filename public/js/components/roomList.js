@@ -1,4 +1,4 @@
-app.component("roomList", {
+app.component("roomsList", {
 	templateUrl: "/partials/rooms.html",
 	bindings: {
 		rooms: '<'

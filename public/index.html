@@ -36,9 +36,15 @@
 				</message>
 
 				<!-- Bot only answers -->
-				<yesNo selectable="answer.selectable" rooms="answer.rooms" ng-if="answer.type == 'yes_no'"></yesNo>
+				<yes-no ng-if="answer.type == 'yes_no'"></yes-no>
 				
-				<roomsList ng-if="answer.type == 'rooms'"></roomsList>
+				<rooms-list
+					ng-if="answer.type == 'rooms'"
+					bookButton="answer.bookButton"
+					availButton="answer.availButton"
+					rooms="answer.rooms"
+					selectable="answer.selectable">
+				</rooms-list>
 				
 				<calendar ng-if="answer.type == 'availability' || answer.type == 'calendar'"></calendar>
 				
