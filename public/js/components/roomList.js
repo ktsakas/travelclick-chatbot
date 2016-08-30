@@ -1,6 +1,10 @@
 app.component("roomsList", {
 	templateUrl: "/partials/rooms.html",
 	bindings: {
+		onSelect: '&',
+		selectable: '<',
+		bookButton: '<',
+		availButton: '<',
 		rooms: '<'
 	},
 	controller: function ($scope/*, $element*/, $http, $timeout) {

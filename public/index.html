@@ -36,21 +36,34 @@
 				</message>
 
 				<!-- Bot only answers -->
-				<yes-no ng-if="answer.type == 'yes_no'"></yes-no>
+				<yes-no
+					ng-if="answer.type == 'yes_no'">
+				</yes-no>
 				
 				<rooms-list
 					ng-if="answer.type == 'rooms'"
 					bookButton="answer.bookButton"
 					availButton="answer.availButton"
 					rooms="answer.rooms"
-					selectable="answer.selectable">
+					selectable="answer.selectable"
+					on-select="sendMessage(text, room);">
 				</rooms-list>
 				
-				<calendar ng-if="answer.type == 'availability' || answer.type == 'calendar'"></calendar>
+				<calendar
+					ng-if="answer.type == 'availability' || answer.type == 'calendar'"
+					selectable="answer.type != 'availability'"
+					on-select="sendMessage(text)"
+					dates="answer.dates">
+				</calendar>
 				
-				<directions ng-if="answer.type == 'directions'"></directions>
+				<directions
+					ng-if="answer.type == 'directions'">
+				</directions>
 
-				<help ng-if="answer.type == 'help'" on-select="sendMessage(text);"></help>
+				<help
+					ng-if="answer.type == 'help'"
+					on-select="sendMessage(text);">
+				</help>
 			</li>
 
 			<!-- Fit height fix -->

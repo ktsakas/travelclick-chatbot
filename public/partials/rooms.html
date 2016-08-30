@@ -1,7 +1,8 @@
 <div class="rooms">
-	<div class="ui fluid card {{$ctrl.selectable ? 'selectable' : ''}}"
+	<div class="ui fluid card"
+		 ng-class="{selectable: $ctrl.selectable}"
 		 ng-repeat="room in $ctrl.rooms track by $index"
-		 ng-click="$ctrl.selectable && $ctrl.onUpdate({ text: 'The &quot;' + room.roomTypeName + '&quot; room.', room: room })">
+		 ng-click="$ctrl.selectable && $ctrl.onSelect({ text: 'The &quot;' + room.roomTypeName + '&quot; room.', room: room })">
 		<div class="content">
 			{{room.roomTypeName}}
 			<div class="meta">
@@ -9,8 +10,8 @@
 			</div>
 		</div>
 
-		<img src="http://placehold.it/200x150" />
-		<!-- <img ng-src="{{room.picture}}" /> -->
+		<!-- <img src="http://placehold.it/200x150" /> -->
+		<img ng-src="{{room.picture}}" />
 
 		<div class="content">
 			<div class="ui two buttons">
@@ -20,7 +21,7 @@
 					Book
 				</button>
 				<button ng-if="$ctrl.availButton" class="ui basic blue button"
-						ng-click="$ctrl.onUpdate({ text: 'The &quot;' + room.roomTypeName + '&quot; room.', rom: room })">
+						ng-click="$ctrl.onSelect({ text: 'The &quot;' + room.roomTypeName + '&quot; room.', rom: room })">
 					Availability
 				</button>
 				<!--  ng-if="rooms.bookButton" -->

@@ -185,6 +185,7 @@ function parseSpecificRoom (text, ctx, entities) {
 		throw new Error("If the room ID is known we should also know the room type and room name.");
 	}
 
+	console.log("entities: ", entities);
 	if (entities.roomId) {
 		ctx.roomId = entities.roomId;
 		ctx.roomTypeName = entities.roomTypeName;
@@ -192,8 +193,11 @@ function parseSpecificRoom (text, ctx, entities) {
 
 		return ctx;
 	} else if (entities.roomTypeName) {
-		return new Hotel(1098).getRoom(entities.roomTypeName)
+		return new Hotel(1098)
+			.getRoom(entities.roomTypeName)
 			.then(function (room) {
+				console.log("specific room found? ", room);
+
 				ctx.roomId = room.id;
 				ctx.roomTypeName = room.roomTypeName;
 				ctx.roomType = room.roomType;
@@ -332,7 +336,10 @@ module.exports = function (text, ctx, entities) {
 		// Parse one missing argument at a time
 		if      (!ctx.dateIn) p = p.then((ctx) => parseDates(ctx, entities));
 		else if (!ctx.nights) p = p.then((ctx) => parseNights(ctx, entities));
-		else if (!ctx.roomId) p = p.then((ctx) => parseSpecificRoom(text, ctx, entities));
+		else if (!ctx.roomId) {
+			console.log("THIRD CASE");
+			p = p.then((ctx) => parseSpecificRoom(text, ctx, entities));
+		}
 	}
 	
 	return p.then(findRooms)

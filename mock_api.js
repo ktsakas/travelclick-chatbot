@@ -205,6 +205,11 @@ app.get('/hotel/:hotelCode/info/rooms', function (req, res) {
 			maxAdultOccupancy: 3,
 			maxChildOccupancy: 1,
 			description: faker.lorem.paragraph(),
+			image: {
+				type: "photo",
+				source: "images/room" + i + ".jpg",
+				sortOrder: 0
+			},
 
 			amenities: []
 		};

@@ -36,8 +36,6 @@ module.exports = function (chat) {
 
 			var p;
 			if (context.book) {
-				console.log("BOOK");
-
 				p = parsers.book(text, context, entities);
 			} else if (context.availability) {
 				p = parsers.availability(text, context, entities);
@@ -48,7 +46,6 @@ module.exports = function (chat) {
 			} else if (context.roomInfo) {
 				p = Promise.resolve( parsers.roomInfo(text, context, entities) );
 			} else if (context.text) {
-				console.log("PARSING TEXT");
 				p = Promise.resolve( parsers.text(text, context, entities) );
 			} else if (context.askHelp) {
 				delete context.askHelp;
@@ -222,7 +219,8 @@ module.exports = function (chat) {
 				amenity: context.roomAmenity,
 				type: context.roomType
 			}, function (err, rooms) {
-				// console.log("rooms: ", rooms);
+				console.log("select rooms: ", rooms[0]);
+
 				rooms = rooms.map(function (room) {
 					var roomTypes = ['single', 'double', 'triple', 'quadruple'];
 
@@ -230,6 +228,8 @@ module.exports = function (chat) {
 						roomId: room.id,
 						roomTypeName: room.roomTypeName,
 						roomType: roomTypes[ room.maxOccupancy - 1 ],
+						description: room.description,
+						picture: room.image.source,
 						maxOccupancy: room.maxOccupancy
 					};
 				});

@@ -1,10 +1,10 @@
-<form name="calendar" ng-controller="calendarCtrl" class="{{answer.type == 'calendar' ? 'temporary' : ''}}">
+<form name="calendar" ng-class="{temporary: $ctrl.selectable}">
 	<input type="text" name="calendarField" style="display: none;" />
 
 	<div class="container">
 		<div class="calendar"></div>
 
-		<span ng-if="answer.type != 'availability'">
+		<span ng-if="$ctrl.selectable">
 			<div class="rangetip">from to</div>
 
 			<input type="button" ng-click="clearCalendar()" class="ui negative basic button" value="Clear" />

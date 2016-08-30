@@ -1,12 +1,18 @@
-app.controller("calendarCtrl", {
+app.component("calendar", {
 	templateUrl: "partials/calendar.html",
+	bindings: {
+		onSelect: '&',
+		dates: '<',
+		selectable: '<'
+	},
 	controller: function ($scope, $element) {
-		var dateIn = null,
+		var $ctrl = this,
+			dateIn = null,
 			dateOut = null;
 
 		$scope.init = function () {
 			var picker = new Pikaday({
-				field: $element[0].calendarField,
+				field: $element.find("[name=calendarField]")[0],
 				firstDay: 1,
 				minDate: new Date(2000, 0, 1),
 				maxDate: new Date(2020, 12, 31),
@@ -14,22 +20,19 @@ app.controller("calendarCtrl", {
 				bound: false,
 				container: $element[0].getElementsByClassName('calendar')[0],
 				onDraw: function () {
-					console.log("answer type: ", $scope.answer.type)
-
-					if ($scope.answer.type == 'availability') {
-						var date = $scope.answer.dates;
-
-						$scope.answer.dates.forEach(function (day) {
-							date = day.date.split('-');
+					if ($ctrl.dates) {
+						$ctrl.dates.forEach(function (day) {
+							var date = day.date.split('-');
 
 							var year = parseInt(date[0]),
 								month = parseInt(date[1]) - 1,
 								monthDay = parseInt(date[2]);
 
-							console.log(date, year, month, monthDay);
-							console.log($element.find("button[data-pika-day=" + monthDay + "]"
+							// console.log("elm: ", $element[0]);
+							// console.log(date, year, month, monthDay);
+							/*console.log($element.find("button[data-pika-day=" + monthDay + "]"
 								+ "[data-pika-month=" + month + "]"
-								+ "[data-pika-year=" + year + "]"));
+								+ "[data-pika-year=" + year + "]"));*/
 
 							$element.find("button[data-pika-day=" + monthDay + "]"
 								+ "[data-pika-month=" + month + "]"
@@ -42,6 +45,7 @@ app.controller("calendarCtrl", {
 					$element.find("button[data-pika-day=15]").addClass('booked');
 
 
+					// Highlight selected dates
 					if (dateIn && dateOut) {
 						var selectDate = moment(dateIn);
 
@@ -49,13 +53,17 @@ app.controller("calendarCtrl", {
 						do {
 							// console.log(selectDate.get('date'), dateOut.getDate());
 
-							$element.find("button[data-pika-day=" + selectDate.get('date') + "][data-pika-month=" + selectDate.get('month') + "]")
+							$element.find("button[data-pika-day=" + selectDate.get('date') + "]"
+								+ "[data-pika-month=" + selectDate.get('month') + "]")
 								.addClass('selected');
 
 						} while (!selectDate.isSame(dateOut) && selectDate.add(1, 'days'));
 					}
 				},
 				onSelect: function () {
+					// Do nothing is the calendar is not selectable
+					if (!$ctrl.selectable) return;
+
 					if (!dateIn) {
 						dateOut = dateIn = this.getDate();
 						picker.setMinDate(dateIn);
@@ -87,7 +95,8 @@ app.controller("calendarCtrl", {
 
 		$scope.selectDate = function () {
 			var datestipElm = $element[0].getElementsByClassName('rangetip')[0];
-			$scope.sendMessage(datestipElm.innerHTML);
+			$ctrl.onSelect({ text: datestipElm.innerHTML });
+			// $ctrl.sendMessage(datestipElm.innerHTML);
 		};
 
 		$scope.init();
