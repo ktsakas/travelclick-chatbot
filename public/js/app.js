@@ -2,7 +2,7 @@ var app = angular.module("chatbot", [/*'jsonFormatter'*/]);
 var sessionId = Math.floor(Math.random() * 1000000) + 1;
 
 app.component("message", { template: "{{ $ctrl.text }}", bindings: { text: '<' } });
-app.component("yesNo", { templateUrl: "/partials/yes-no.html" });
+app.component("yesNo", { templateUrl: "/partials/yes-no.html", bindings: { onSelect: '&' } });
 app.component("help", { templateUrl: "/partials/help.html", bindings: { onSelect: '&' } });
 
 app.controller("chatCtrl", function ($scope/*, $element*/, $http, $timeout) {

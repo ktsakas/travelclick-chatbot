@@ -37,7 +37,8 @@
 
 				<!-- Bot only answers -->
 				<yes-no
-					ng-if="answer.type == 'yes_no'">
+					ng-if="answer.type == 'yes_no'"
+					on-select="sendMessage(text);">
 				</yes-no>
 				
 				<rooms-list

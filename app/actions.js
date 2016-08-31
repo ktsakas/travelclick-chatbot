@@ -179,6 +179,8 @@ module.exports = function (chat) {
 							roomId: room.id,
 							roomTypeName: room.roomTypeName,
 							roomType: roomTypes[ room.maxOccupancy - 1 ],
+							description: room.description,
+							picture: room.image.source,
 							maxOccupancy: room.maxOccupancy
 						};
 					});

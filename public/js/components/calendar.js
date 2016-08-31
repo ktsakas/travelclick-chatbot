@@ -41,9 +41,6 @@ app.component("calendar", {
 						});
 					}
 
-					$element.find("button[data-pika-day=14]").addClass('avail');
-					$element.find("button[data-pika-day=15]").addClass('booked');
-
 
 					// Highlight selected dates
 					if (dateIn && dateOut) {
